@@ -81,6 +81,49 @@ def api_summary():
     )
 
 
+@app.route("/api/heatmap")
+def api_heatmap():
+    prefix = TABLE_PREFIX
+    month_category = query_db(
+        f"SELECT CONCAT(YEAR(p.post_date), '-', LPAD(MONTH(p.post_date), 2, '0')) AS month,"
+        f" t.name AS category, COUNT(*) AS count"
+        f" FROM {prefix}posts p"
+        f" JOIN {prefix}term_relationships tr ON p.ID = tr.object_id"
+        f" JOIN {prefix}term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id"
+        f" JOIN {prefix}terms t ON tt.term_id = t.term_id"
+        f" WHERE tt.taxonomy = 'category' AND p.post_type = 'post'"
+        f" AND p.post_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)"
+        f" GROUP BY month, t.term_id ORDER BY month, count DESC"
+    )
+    top_categories = query_db(
+        f"SELECT t.name AS category, COUNT(*) AS total"
+        f" FROM {prefix}posts p"
+        f" JOIN {prefix}term_relationships tr ON p.ID = tr.object_id"
+        f" JOIN {prefix}term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id"
+        f" JOIN {prefix}terms t ON tt.term_id = t.term_id"
+        f" WHERE tt.taxonomy = 'category' AND p.post_type = 'post'"
+        f" GROUP BY t.term_id ORDER BY total DESC LIMIT 10"
+    )
+    top_cat_names = [r["category"] for r in top_categories]
+    category_author = query_db(
+        f"SELECT t.name AS category, u.display_name AS author_name, COUNT(*) AS count"
+        f" FROM {prefix}posts p"
+        f" JOIN {prefix}users u ON p.post_author = u.ID"
+        f" JOIN {prefix}term_relationships tr ON p.ID = tr.object_id"
+        f" JOIN {prefix}term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id"
+        f" JOIN {prefix}terms t ON tt.term_id = t.term_id"
+        f" WHERE tt.taxonomy = 'category' AND p.post_type = 'post'"
+        f" AND t.name IN ({','.join(['%s'] * len(top_cat_names))})"
+        f" GROUP BY t.term_id, u.ID ORDER BY count DESC",
+        tuple(top_cat_names),
+    )
+    return jsonify(
+        month_category=month_category,
+        category_author=category_author,
+        top_categories=top_cat_names,
+    )
+
+
 @app.route("/api/ping")
 def api_ping():
     try:

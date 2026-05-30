@@ -1,5 +1,17 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env or .env.local
+ROOT = Path(__file__).resolve().parent.parent
+ENV_FILE = ROOT / ".env"
+ENV_LOCAL_FILE = ROOT / ".env.local"
+
+# Load from .env first (production), then .env.local (local development)
+if ENV_FILE.exists():
+    load_dotenv(ENV_FILE)
+elif ENV_LOCAL_FILE.exists():
+    load_dotenv(ENV_LOCAL_FILE)
 
 
 def parse_credentials_file(filename: str) -> dict[str, str]:
@@ -19,7 +31,6 @@ def parse_credentials_file(filename: str) -> dict[str, str]:
     return credentials
 
 
-ROOT = Path(__file__).resolve().parent.parent
 BLOG_DB_FILE = ROOT / "blog_db.sql"
 LOCAL_CREDS_FILE = ROOT / "localdb_creds.sql"
 

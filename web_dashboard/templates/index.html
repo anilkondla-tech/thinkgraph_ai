@@ -6,6 +6,7 @@
     <title>WordPress Blog Analytics</title>
     <link rel="stylesheet" href="/static/style.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   </head>
   <body>
     <header>
@@ -30,6 +31,24 @@
         <article class="chart-card">
           <h2>Top Categories</h2>
           <canvas id="categoriesChart"></canvas>
+        </article>
+      </section>
+
+      <section class="heatmap-section">
+        <article class="chart-card full-width">
+          <h2>Posts by Month &amp; Category (Last 12 Months)</h2>
+          <div class="heatmap-scroll">
+            <table id="heatmap-table" class="heatmap-table"></table>
+          </div>
+        </article>
+      </section>
+
+      <section class="heatmap-section">
+        <article class="chart-card full-width">
+          <h2>Category &amp; Author Distribution</h2>
+          <div class="heatmap-scroll">
+            <table id="cat-author-heatmap" class="heatmap-table"></table>
+          </div>
         </article>
       </section>
 
@@ -118,6 +137,62 @@
         };
       }
 
+      const PALETTE = ['#4E79A7','#F28E2B','#E15759','#76B7B2','#59A14F','#EDC948','#B07AA1','#FF9DA7','#9C755F','#BAB0AC'];
+
+      function renderHeatmap(data, categories) {
+        const months = [...new Set(data.map(d => d.month))].sort();
+        const lookup = {};
+        data.forEach(d => { lookup[`${d.month}||${d.category}`] = d.count; });
+        const maxVal = Math.max(...data.map(d => d.count), 1);
+
+        const table = document.getElementById('heatmap-table');
+        let html = '<thead><tr><th>Category</th>' + months.map(m => `<th>${m}</th>`).join('') + '</tr></thead><tbody>';
+        categories.forEach(cat => {
+          html += `<tr><td class="heatmap-label">${cat}</td>`;
+          months.forEach(m => {
+            const v = lookup[`${m}||${cat}`] || 0;
+            const intensity = v / maxVal;
+            const bg = v === 0 ? '#f0f0f0' : `rgba(79,114,167,${0.15 + intensity * 0.85})`;
+            const color = intensity > 0.5 ? '#fff' : '#222';
+            html += `<td class="heatmap-cell" style="background:${bg};color:${color}" title="${cat} • ${m}: ${v}">${v || ''}</td>`;
+          });
+          html += '</tr>';
+        });
+        html += '</tbody>';
+        table.innerHTML = html;
+      }
+
+      function renderCategoryAuthorHeatmap(data, categories) {
+        const authors = [...new Set(data.map(d => d.author_name))].sort();
+        const lookup = {};
+        data.forEach(d => { lookup[`${d.category}||${d.author_name}`] = d.count; });
+        const maxVal = Math.max(...data.map(d => d.count), 1);
+
+        const table = document.getElementById('cat-author-heatmap');
+        let html = '<thead><tr><th>Category</th>' + authors.map(a => `<th>${a}</th>`).join('') + '<th>Total</th></tr></thead><tbody>';
+        categories.forEach(cat => {
+          const rowTotal = authors.reduce((s, a) => s + (lookup[`${cat}||${a}`] || 0), 0);
+          html += `<tr><td class="heatmap-label">${cat}</td>`;
+          authors.forEach(a => {
+            const v = lookup[`${cat}||${a}`] || 0;
+            const intensity = v / maxVal;
+            const bg = v === 0 ? '#f0f0f0' : `rgba(89,161,79,${0.15 + intensity * 0.85})`;
+            const color = intensity > 0.5 ? '#fff' : '#222';
+            html += `<td class="heatmap-cell" style="background:${bg};color:${color}" title="${cat} × ${a}: ${v}">${v || ''}</td>`;
+          });
+          html += `<td class="heatmap-total">${rowTotal}</td></tr>`;
+        });
+        // totals row
+        html += '<tr><td class="heatmap-label" style="font-weight:700">Total</td>';
+        authors.forEach(a => {
+          const t = categories.reduce((s, cat) => s + (lookup[`${cat}||${a}`] || 0), 0);
+          html += `<td class="heatmap-total">${t}</td>`;
+        });
+        html += '<td class="heatmap-total"></td></tr>';
+        html += '</tbody>';
+        table.innerHTML = html;
+      }
+
       loadSummary().then((summary) => {
         if (!summary) return;
         renderSummaryCards(summary);
@@ -132,6 +207,11 @@
 
         const categoryData = buildChartData(summary.category_summary, 'category', 'count');
         createChart('categoriesChart', 'bar', categoryData.labels, categoryData.data, 'Top Categories');
+      });
+
+      fetch('/api/heatmap').then(r => r.json()).then(data => {
+        renderHeatmap(data.month_category, data.top_categories);
+        renderCategoryAuthorHeatmap(data.category_author, data.top_categories);
       });
     </script>
   </body>

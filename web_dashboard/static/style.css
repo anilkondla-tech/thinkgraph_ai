@@ -62,13 +62,13 @@ main {
   grid-template-columns: 1.3fr 1fr;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  align-items: start;
 }
 
 .chart-card {
   background: white;
   border-radius: 20px;
   padding: 1.25rem;
-  min-height: 340px;
   box-shadow: 0 12px 30px rgba(17, 24, 39, 0.08);
 }
 
@@ -79,7 +79,8 @@ main {
 
 .chart-card canvas {
   width: 100% !important;
-  height: calc(100% - 40px) !important;
+  height: 260px !important;
+  max-height: 260px !important;
 }
 
 .tables-grid {
@@ -121,6 +122,77 @@ tbody tr:last-child td {
   padding: 2rem;
   font-size: 1.1rem;
   text-align: center;
+}
+
+.heatmap-section {
+  margin-bottom: 1.5rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.heatmap-scroll {
+  overflow-x: auto;
+}
+
+.heatmap-table {
+  border-collapse: separate;
+  border-spacing: 3px;
+  width: 100%;
+  font-size: 0.82rem;
+}
+
+.heatmap-table thead th {
+  background: #eef2ff;
+  padding: 0.4rem 0.6rem;
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.heatmap-label {
+  padding: 0.4rem 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  background: #f8f9fc;
+  border-radius: 4px;
+}
+
+.heatmap-cell {
+  padding: 0.35rem 0.5rem;
+  text-align: center;
+  border-radius: 4px;
+  cursor: default;
+  min-width: 42px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+.heatmap-cell:hover {
+  opacity: 0.8;
+  outline: 2px solid #4f46e5;
+}
+
+.heatmap-total {
+  padding: 0.35rem 0.5rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.82rem;
+  background: #eef2ff;
+  border-radius: 4px;
+  color: #4f46e5;
+}
+
+.charts-grid.single-col {
+  grid-template-columns: 1fr;
+}
+
+.charts-grid.single-col .chart-card canvas {
+  height: 340px !important;
+  max-height: 340px !important;
 }
 
 @media (max-width: 950px) {
