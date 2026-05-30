@@ -218,6 +218,43 @@
                 </div>
             </div>
         </div>
+
+        <!-- Keywords Section -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden mt-8">
+            <div class="p-6 border-b border-gray-200 dark:border-slate-700">
+                <h3 class="text-lg font-semibold">Keywords by Article</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm" id="keywords-table">
+                    <thead class="bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
+                        <tr>
+                            <th class="px-6 py-3 text-left font-semibold">Article Title</th>
+                            <th class="px-6 py-3 text-left font-semibold">Keywords</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-slate-700"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Articles Without Keywords Section -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden mt-8">
+            <div class="p-6 border-b border-gray-200 dark:border-slate-700">
+                <h3 class="text-lg font-semibold">Articles Without Keywords</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">These articles need SEO keyword optimization</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm" id="no-keywords-table">
+                    <thead class="bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
+                        <tr>
+                            <th class="px-6 py-3 text-left font-semibold">Article Title</th>
+                            <th class="px-6 py-3 text-left font-semibold">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-slate-700"></tbody>
+                </table>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -448,6 +485,55 @@
             `).join('');
         }
 
+        function renderKeywordsTable(articles) {
+            const tbody = document.querySelector('#keywords-table tbody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = articles.map(article => {
+                const title = article.title || 'Untitled';
+                const permalink = article.permalink || '#';
+                const keywords = article.keywords || 'Not set';
+                
+                return `
+                    <tr class="border-t border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-smooth">
+                        <td class="px-6 py-3 text-sm">
+                            <a href="${permalink}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                                ${title}
+                            </a>
+                        </td>
+                        <td class="px-6 py-3 text-sm text-gray-600 dark:text-gray-300">
+                            ${keywords}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderNoKeywordsTable(articles) {
+            const tbody = document.querySelector('#no-keywords-table tbody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = articles.map(article => {
+                const title = article.title || 'Untitled';
+                const permalink = article.permalink || '#';
+                
+                return `
+                    <tr class="border-t border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-smooth">
+                        <td class="px-6 py-3 text-sm">
+                            <a href="${permalink}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                                ${title}
+                            </a>
+                        </td>
+                        <td class="px-6 py-3 text-xs">
+                            <span class="inline-block bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full font-medium">
+                                Missing Keywords
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
         function setLoadingState(isLoading) {
             const loadingIndicator = document.getElementById('loading-indicator');
             const siteSelect = document.getElementById('site-select');
@@ -563,6 +649,48 @@
                 console.error('Heatmap load error:', error);
                 renderHeatmapError('heatmap-table', 'month/category heatmap');
                 renderHeatmapError('cat-author-heatmap', 'author/category heatmap');
+            }
+
+            try {
+                const encodedSite = encodeURIComponent(siteKey);
+                const keywordsResponse = await fetch(`/api/keywords?site=${encodedSite}`);
+                if (!keywordsResponse.ok) throw new Error('Failed to load keywords data');
+
+                const keywordsData = await keywordsResponse.json();
+                renderKeywordsTable(keywordsData.articles);
+            } catch (error) {
+                console.error('Keywords load error:', error);
+                const tbody = document.querySelector('#keywords-table tbody');
+                if (tbody) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="2" class="px-6 py-6 text-center text-sm text-red-600 dark:text-red-300">
+                                Could not load keywords
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+
+            try {
+                const encodedSite = encodeURIComponent(siteKey);
+                const noKeywordsResponse = await fetch(`/api/no-keywords?site=${encodedSite}`);
+                if (!noKeywordsResponse.ok) throw new Error('Failed to load no-keywords data');
+
+                const noKeywordsData = await noKeywordsResponse.json();
+                renderNoKeywordsTable(noKeywordsData.articles);
+            } catch (error) {
+                console.error('No keywords load error:', error);
+                const tbody = document.querySelector('#no-keywords-table tbody');
+                if (tbody) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="2" class="px-6 py-6 text-center text-sm text-red-600 dark:text-red-300">
+                                Could not load articles without keywords
+                            </td>
+                        </tr>
+                    `;
+                }
             }
         }
 

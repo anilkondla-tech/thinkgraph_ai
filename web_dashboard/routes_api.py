@@ -6,11 +6,24 @@ from config import (
     CACHE_SUMMARY_TIMEOUT,
     CACHE_HEATMAP_TIMEOUT,
     get_connection_string_for_site,
+    get_site_public_url,
     get_site_config,
 )
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 cache = Cache()
+
+
+def _build_article_url(site_key: str | None, slug: str | None, post_id: int) -> str:
+    base_url = get_site_public_url(site_key)
+    clean_slug = (slug or "").strip("/")
+    if base_url and clean_slug:
+        return f"{base_url}/{clean_slug}/"
+    if base_url:
+        return f"{base_url}/?p={post_id}"
+    if clean_slug:
+        return f"/{clean_slug}/"
+    return f"/?p={post_id}"
 
 
 @api_bp.route("/ping")
@@ -161,3 +174,74 @@ def heatmap():
         category_author=category_author,
         top_categories=top_cat_names,
     )
+
+
+@api_bp.route("/keywords")
+@cache.cached(timeout=CACHE_SUMMARY_TIMEOUT, query_string=True)
+def keywords():
+    """Get article keywords and links."""
+    site_key = request.args.get("site")
+    prefix = get_prefix(site_key)
+    
+    # Get posts with keywords from postmeta (Rank Math, Yoast, Aioseo, and other plugins)
+    articles = query_db(
+        f"SELECT p.ID, p.post_title, p.post_name, p.post_date, "
+        f"COALESCE(m1.meta_value, m2.meta_value, m3.meta_value, m4.meta_value, 'N/A') AS keywords "
+        f"FROM {prefix}posts p "
+        f"LEFT JOIN {prefix}postmeta m1 ON p.ID = m1.post_id AND m1.meta_key = 'rank_math_focus_keyword' "
+        f"LEFT JOIN {prefix}postmeta m2 ON p.ID = m2.post_id AND m2.meta_key = '_yoast_wpseo_focuskw' "
+        f"LEFT JOIN {prefix}postmeta m3 ON p.ID = m3.post_id AND m3.meta_key = '_aioseo_keywords' "
+        f"LEFT JOIN {prefix}postmeta m4 ON p.ID = m4.post_id AND m4.meta_key = '_keyword' "
+        f"WHERE p.post_type = 'post' AND p.post_status = 'publish' "
+        f"ORDER BY p.post_date DESC LIMIT 30",
+        site_key=site_key,
+    )
+    
+    # Convert to include permalink
+    articles_with_links = []
+    for article in articles:
+        articles_with_links.append({
+            'post_id': article['ID'],
+            'title': article['post_title'],
+            'slug': article['post_name'],
+            'date': article['post_date'],
+            'permalink': _build_article_url(site_key, article['post_name'], article['ID']),
+            'keywords': article['keywords'] if article['keywords'] and article['keywords'] != 'N/A' else 'Not set'
+        })
+    
+    return jsonify(articles=articles_with_links)
+
+
+@api_bp.route("/no-keywords")
+@cache.cached(timeout=CACHE_SUMMARY_TIMEOUT, query_string=True)
+def no_keywords():
+    """Get articles without keywords configured."""
+    site_key = request.args.get("site")
+    prefix = get_prefix(site_key)
+    
+    # Get posts WITHOUT keywords in any of the SEO plugin fields
+    articles = query_db(
+        f"SELECT DISTINCT p.ID, p.post_title, p.post_name, p.post_date "
+        f"FROM {prefix}posts p "
+        f"WHERE p.post_type = 'post' AND p.post_status = 'publish' "
+        f"AND p.ID NOT IN ("
+        f"  SELECT DISTINCT post_id FROM {prefix}postmeta "
+        f"  WHERE meta_key IN ('rank_math_focus_keyword', '_yoast_wpseo_focuskw', '_aioseo_keywords', '_keyword') "
+        f"  AND meta_value IS NOT NULL AND meta_value != ''"
+        f") "
+        f"ORDER BY p.post_date DESC LIMIT 30",
+        site_key=site_key,
+    )
+    
+    # Convert to include permalink
+    articles_without_keywords = []
+    for article in articles:
+        articles_without_keywords.append({
+            'post_id': article['ID'],
+            'title': article['post_title'],
+            'slug': article['post_name'],
+            'date': article['post_date'],
+            'permalink': _build_article_url(site_key, article['post_name'], article['ID']),
+        })
+    
+    return jsonify(articles=articles_without_keywords)

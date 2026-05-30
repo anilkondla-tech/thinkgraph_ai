@@ -67,6 +67,7 @@ def _to_int(value: str | None, default: int) -> int:
 SITE_CONFIGS: dict[str, dict[str, str | int]] = {
     "tech360d": {
         "label": clean_env_value(os.getenv("SITE_TECH360D_LABEL"), "Tech360d"),
+        "site_url": clean_env_value(os.getenv("SITE_TECH360D_URL"), "https://tech360d.com"),
         "host": clean_env_value(os.getenv("SITE_TECH360D_HOST"), "srv1060.hstgr.io"),
         "port": _to_int(os.getenv("SITE_TECH360D_PORT"), 3306),
         "user": clean_env_value(os.getenv("SITE_TECH360D_USER"), "u974173543_zbBHi"),
@@ -76,6 +77,7 @@ SITE_CONFIGS: dict[str, dict[str, str | int]] = {
     },
     "techinfobeez": {
         "label": clean_env_value(os.getenv("SITE_TECHINFOBEEZ_LABEL"), "Techinfobeez"),
+        "site_url": clean_env_value(os.getenv("SITE_TECHINFOBEEZ_URL"), "https://techinfobeez.com"),
         "host": clean_env_value(os.getenv("SITE_TECHINFOBEEZ_HOST"), "srv1060.hstgr.io"),
         "port": _to_int(os.getenv("SITE_TECHINFOBEEZ_PORT"), 3306),
         "user": clean_env_value(os.getenv("SITE_TECHINFOBEEZ_USER"), "u974173543_mzHeJ"),
@@ -85,6 +87,7 @@ SITE_CONFIGS: dict[str, dict[str, str | int]] = {
     },
     "fashionsgalaxy": {
         "label": clean_env_value(os.getenv("SITE_FASHIONSGALAXY_LABEL"), "Fashionsgalaxy"),
+        "site_url": clean_env_value(os.getenv("SITE_FASHIONSGALAXY_URL"), "https://fashionsgalaxy.com"),
         "host": clean_env_value(os.getenv("SITE_FASHIONSGALAXY_HOST"), "srv1060.hstgr.io"),
         "port": _to_int(os.getenv("SITE_FASHIONSGALAXY_PORT"), 3306),
         "user": clean_env_value(os.getenv("SITE_FASHIONSGALAXY_USER"), "u974173543_DZczJ"),
@@ -94,6 +97,7 @@ SITE_CONFIGS: dict[str, dict[str, str | int]] = {
     },
     "techsprohub": {
         "label": clean_env_value(os.getenv("SITE_TECHSPROHUB_LABEL"), "Techsprohub"),
+        "site_url": clean_env_value(os.getenv("SITE_TECHSPROHUB_URL"), "https://techsprohub.com"),
         "host": clean_env_value(os.getenv("SITE_TECHSPROHUB_HOST"), DB_HOST),
         "port": _to_int(os.getenv("SITE_TECHSPROHUB_PORT"), DB_PORT),
         "user": clean_env_value(os.getenv("SITE_TECHSPROHUB_USER"), DB_USER),
@@ -120,6 +124,16 @@ def get_available_sites() -> list[dict[str, str]]:
     for key, cfg in SITE_CONFIGS.items():
         sites.append({"key": key, "label": str(cfg["label"])})
     return sites
+
+
+def get_site_public_url(site_key: str | None = None) -> str:
+    cfg = get_site_config(site_key)
+    raw_url = str(cfg.get("site_url", "")).strip()
+    if not raw_url:
+        return ""
+    if raw_url.startswith("http://") or raw_url.startswith("https://"):
+        return raw_url.rstrip("/")
+    return f"https://{raw_url.rstrip('/')}"
 
 
 def get_connection_string() -> str:
