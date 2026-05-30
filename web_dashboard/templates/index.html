@@ -25,12 +25,12 @@
           <canvas id="postStatusChart"></canvas>
         </article>
         <article class="chart-card">
-          <h2>Posts in Last 30 Days</h2>
-          <canvas id="recentPostsChart"></canvas>
-        </article>
-        <article class="chart-card">
           <h2>Top Categories</h2>
           <canvas id="categoriesChart"></canvas>
+        </article>
+        <article class="chart-card full-width">
+          <h2>Posts in Last 52 Weeks</h2>
+          <canvas id="recentPostsChart"></canvas>
         </article>
       </section>
 
@@ -202,8 +202,8 @@
         const postStatusData = buildChartData(summary.status_summary, 'status', 'count');
         createChart('postStatusChart', 'doughnut', postStatusData.labels, postStatusData.data, 'Posts by Status');
 
-        const recentTimeline = buildChartData(summary.posts_last_30_days, 'day', 'count');
-        createChart('recentPostsChart', 'line', recentTimeline.labels, recentTimeline.data, 'Posts per Day');
+        const recentTimeline = buildChartData(summary.posts_last_30_days, 'week', 'count');
+        createChart('recentPostsChart', 'line', recentTimeline.labels, recentTimeline.data, 'Posts per Week');
 
         const categoryData = buildChartData(summary.category_summary, 'category', 'count');
         createChart('categoriesChart', 'bar', categoryData.labels, categoryData.data, 'Top Categories');

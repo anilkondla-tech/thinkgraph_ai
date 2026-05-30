@@ -186,6 +186,15 @@ tbody tr:last-child td {
   color: #4f46e5;
 }
 
+.chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.chart-card.full-width canvas {
+  height: 220px !important;
+  max-height: 220px !important;
+}
+
 .charts-grid.single-col {
   grid-template-columns: 1fr;
 }

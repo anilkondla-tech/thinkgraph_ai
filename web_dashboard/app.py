@@ -33,7 +33,7 @@ def index():
 def api_summary():
     prefix = TABLE_PREFIX
     status_summary = query_db(
-        f"SELECT post_status AS status, COUNT(*) AS count FROM {prefix}posts WHERE post_type='post' GROUP BY post_status"
+        f"SELECT post_status AS status, COUNT(*) AS count FROM {prefix}posts WHERE post_type='post' AND post_status != 'publish' GROUP BY post_status"
     )
     total_posts = query_db(
         f"SELECT COUNT(*) AS count FROM {prefix}posts WHERE post_type='post'"
@@ -63,10 +63,10 @@ def api_summary():
         f" GROUP BY t.term_id ORDER BY count DESC LIMIT 10"
     )
     posts_last_30_days = query_db(
-        f"SELECT DATE(post_date) AS day, COUNT(*) AS count"
+        f"SELECT DATE_FORMAT(DATE_SUB(post_date, INTERVAL WEEKDAY(post_date) DAY), '%%Y-%%m-%%d') AS week, COUNT(*) AS count"
         f" FROM {prefix}posts"
-        f" WHERE post_type = 'post' AND post_date >= CURDATE() - INTERVAL 30 DAY"
-        f" GROUP BY DATE(post_date) ORDER BY day"
+        f" WHERE post_type = 'post' AND post_date >= CURDATE() - INTERVAL 52 WEEK"
+        f" GROUP BY DATE_SUB(post_date, INTERVAL WEEKDAY(post_date) DAY) ORDER BY week"
     )
     return jsonify(
         db_connection=get_connection_string(),
