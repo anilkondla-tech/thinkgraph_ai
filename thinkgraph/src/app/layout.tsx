@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import Shell from "@/components/Shell";
 import { listSites } from "@/lib/data";
@@ -18,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Shell sites={sites}>{children}</Shell>
+        <Suspense fallback={null}>
+          <Shell sites={sites}>{children}</Shell>
+        </Suspense>
       </body>
     </html>
   );
