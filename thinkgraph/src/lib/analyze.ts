@@ -221,6 +221,56 @@ function articleUrl(site: SiteMeta, slug: string, id: string): string {
   return `#${id}`;
 }
 
+const STOP_WORDS = new Set([
+  "the", "a", "an", "and", "or", "for", "to", "of", "in", "on", "with",
+  "your", "you", "how", "what", "why", "is", "are", "be", "best", "top",
+  "guide", "vs", "from", "by", "this", "that", "it", "as", "at",
+]);
+
+/** Significant lowercase word tokens from a post's title + focus keyword. */
+function topicTokens(node: GraphNode): Set<string> {
+  const text = `${node.label} ${node.keyword ?? ""}`.toLowerCase();
+  const words = text.replace(/[^a-z0-9\s]/g, " ").split(/\s+/);
+  return new Set(words.filter((w) => w.length > 2 && !STOP_WORDS.has(w)));
+}
+
+function tokenOverlap(a: Set<string>, b: Set<string>): number {
+  let n = 0;
+  a.forEach((w) => {
+    if (b.has(w)) n += 1;
+  });
+  return n;
+}
+
+/**
+ * For an orphan, rank the best existing posts to add an inbound link *from*.
+ * Relevance = same category + title/keyword overlap; tie-break toward
+ * well-connected, non-orphan hubs (their link equity actually reaches the orphan).
+ */
+function suggestLinkSources(
+  orphan: GraphNode,
+  nodes: GraphNode[],
+  tokensById: Map<string, Set<string>>,
+  limit = 3
+): GraphNode[] {
+  const orphanTokens = tokensById.get(orphan.id) ?? new Set<string>();
+  return nodes
+    .filter((n) => n.id !== orphan.id)
+    .map((n) => {
+      const sameCategory = n.category === orphan.category ? 2 : 0;
+      const overlap = tokenOverlap(orphanTokens, tokensById.get(n.id) ?? new Set());
+      // Hubs that already have inbound links pass equity on; orphans don't.
+      const authority = (n.orphan ? 0 : 0.5) + Math.min(n.inDegree, 4) * 0.25;
+      return { node: n, score: sameCategory + overlap + authority };
+    })
+    .filter((c) => c.score > 0)
+    .sort((a, b) =>
+      b.score - a.score || b.node.date.localeCompare(a.node.date)
+    )
+    .slice(0, limit)
+    .map((c) => c.node);
+}
+
 /** Deterministic, explainable recommendations from graph signals. */
 function buildRuleActions(
   nodes: GraphNode[],
@@ -230,20 +280,33 @@ function buildRuleActions(
   const actions: ActionItem[] = [];
   const byDateDesc = (a: GraphNode, b: GraphNode) => b.date.localeCompare(a.date);
 
-  // 1. Orphan posts → add inbound internal links
+  const tokensById = new Map<string, Set<string>>(
+    nodes.map((n) => [n.id, topicTokens(n)])
+  );
+
+  // 1. Orphan posts → suggest the specific posts to add inbound links *from*
   nodes
     .filter((n) => n.orphan)
     .sort(byDateDesc)
     .slice(0, 6)
     .forEach((n) => {
+      const sources = suggestLinkSources(n, nodes, tokensById);
+      const rationale = sources.length
+        ? `This post is an orphan — no other post links to it, so it's invisible to crawlers and readers navigating your site. Add a contextual link to it from these related ${n.category} posts:`
+        : `This post is an orphan — no other post links to it, so it's invisible to crawlers and readers navigating your site. Link to it from related ${n.category} posts.`;
       actions.push({
         id: `link-${n.id}`,
         type: "link",
         title: `Add internal links to “${n.label}”`,
-        rationale: `This post is an orphan — no other post links to it, so it's invisible to crawlers and readers navigating your site. Link to it from related ${n.category} posts.`,
+        rationale,
         impact: "high",
         cluster: n.category,
-        targets: [{ label: n.label, url: articleUrl(site, n.slug, n.id) }],
+        targets: sources.length
+          ? sources.map((s) => ({
+              label: s.label,
+              url: articleUrl(site, s.slug, s.id),
+            }))
+          : [{ label: n.label, url: articleUrl(site, n.slug, n.id) }],
         source: "rule",
       });
     });
