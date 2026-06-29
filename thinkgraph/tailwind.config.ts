@@ -44,10 +44,15 @@ const config: Config = {
           "0%, 100%": { opacity: "0.6" },
           "50%": { opacity: "1" },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.5s ease-out both",
         pulseglow: "pulseglow 2.4s ease-in-out infinite",
+        float: "float 5s ease-in-out infinite",
       },
     },
   },

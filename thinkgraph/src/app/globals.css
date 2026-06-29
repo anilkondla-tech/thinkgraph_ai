@@ -62,4 +62,10 @@
   .label-muted {
     @apply text-[11px] font-semibold uppercase tracking-wider text-slate-500;
   }
+  .text-gradient {
+    background: linear-gradient(135deg, #a99bff 0%, #3ad6c5 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }

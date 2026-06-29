@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import type { SiteMeta } from "@/lib/types";
-import { Logo, IconGrid, IconGraph, IconLayers, IconBolt, IconChevron } from "./icons";
+import { Logo, IconGrid, IconGraph, IconLayers, IconBolt, IconChevron, IconSparkle } from "./icons";
+import UserMenu from "./UserMenu";
 
 const NAV = [
   { href: "/", label: "Overview", icon: IconGrid },
@@ -67,6 +68,22 @@ export default function Shell({
         </nav>
 
         <div className="mt-auto space-y-3">
+          {/* Upgrade CTA */}
+          <div className="rounded-xl border border-accent/[0.2] bg-gradient-to-br from-accent/[0.1] to-transparent p-3.5">
+            <div className="mb-1 flex items-center gap-1.5">
+              <IconSparkle className="h-3.5 w-3.5 text-accent-soft" />
+              <span className="text-[11px] font-semibold text-white">Upgrade to Pro</span>
+            </div>
+            <p className="text-[10px] leading-relaxed text-slate-500">
+              Unlock AI insights, gap detection, and priority scoring.
+            </p>
+            <Link
+              href="/onboarding"
+              className="mt-2 block rounded-lg bg-accent/[0.15] py-1.5 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.25]"
+            >
+              Connect site →
+            </Link>
+          </div>
           <div className="card card-pad !p-3.5">
             <div className="label-muted mb-1">Workspace</div>
             <p className="text-xs leading-relaxed text-slate-400">
@@ -109,6 +126,7 @@ export default function Shell({
             >
               {pending ? "…" : "Refresh"}
             </button>
+            <UserMenu />
           </div>
         </header>
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { IconSparkle } from "./icons";
+import Paywall from "./Paywall";
 
 export default function AiInsight({
   siteKey,
@@ -15,6 +16,7 @@ export default function AiInsight({
   const [insight, setInsight] = useState<string | null>(initialInsight);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paywallDismissed, setPaywallDismissed] = useState(false);
 
   const generate = async () => {
     setLoading(true);
@@ -69,14 +71,32 @@ export default function AiInsight({
           {error && <p className="text-xs text-rose">{error}</p>}
         </div>
       ) : (
-        <p className="rounded-lg bg-white/[0.04] px-3 py-2.5 text-sm text-slate-400">
-          AI insights are off. Add{" "}
-          <code className="rounded bg-ink-700 px-1.5 py-0.5 text-xs text-accent-soft">
-            ANTHROPIC_API_KEY
-          </code>{" "}
-          to your environment to enable Claude-powered recommendations. The graph and
-          rule-based actions below work without it.
-        </p>
+        /* Paywall: blurred placeholder content + upgrade overlay */
+        <div className="relative min-h-[120px]">
+          {/* Blurred ghost content */}
+          <div className="select-none blur-sm" aria-hidden>
+            <p className="text-sm leading-relaxed text-slate-300">
+              Your top cluster "Technology" has 24 posts but only 3 internal links pointing
+              to your cornerstone piece. Prioritizing 8 targeted internal-link additions
+              could raise topical authority by ~18% — the single highest-leverage move
+              this week for both Google rankings and ChatGPT citations.
+            </p>
+          </div>
+          {/* Paywall overlay */}
+          {!paywallDismissed && (
+            <Paywall reason="ai-key" onDismiss={() => setPaywallDismissed(true)} />
+          )}
+          {paywallDismissed && (
+            <p className="mt-2 rounded-lg bg-white/[0.04] px-3 py-2.5 text-xs text-slate-500">
+              Add{" "}
+              <code className="rounded bg-ink-700 px-1.5 py-0.5 text-accent-soft">
+                ANTHROPIC_API_KEY
+              </code>{" "}
+              to your <code className="rounded bg-ink-700 px-1.5 py-0.5 text-accent-soft">.env.local</code>{" "}
+              to unlock AI insights.
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

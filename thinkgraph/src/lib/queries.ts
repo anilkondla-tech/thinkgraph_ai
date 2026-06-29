@@ -1,6 +1,6 @@
 import "server-only";
-import { query } from "./db";
-import { getSiteConnection } from "./sites";
+import { query, queryWithConn } from "./db";
+import { getSiteConnection, type SiteConnection } from "./sites";
 
 const POST_LIMIT = 600; // cap content-bearing rows to keep the shared DB happy
 
@@ -24,11 +24,21 @@ export type RawSite = {
   totalComments: number;
 };
 
-export async function fetchRawSite(siteKey: string): Promise<RawSite> {
-  const p = getSiteConnection(siteKey).prefix;
+export async function fetchRawSite(
+  siteKey: string,
+  userConn?: SiteConnection
+): Promise<RawSite> {
+  const p = userConn
+    ? userConn.prefix
+    : getSiteConnection(siteKey).prefix;
 
-  // Published posts with content (for the graph + link extraction).
-  const posts = await query<{
+  // Helper: routes to explicit connection or pool-based connection
+  const q = userConn
+    ? <T = Record<string, unknown>>(sql: string, params?: unknown[]) =>
+        queryWithConn<T>(userConn, sql, params)
+    : <T = Record<string, unknown>>(sql: string, params?: unknown[]) =>
+        query<T>(siteKey, sql, params);
+  const posts = await q<{
     ID: number;
     post_title: string;
     post_name: string;
@@ -37,7 +47,6 @@ export async function fetchRawSite(siteKey: string): Promise<RawSite> {
     post_author: number;
     post_content: string;
   }>(
-    siteKey,
     `SELECT ID, post_title, post_name, post_date, post_status, post_author, post_content
      FROM ${p}posts
      WHERE post_type = 'post' AND post_status = 'publish'
@@ -55,15 +64,13 @@ export async function fetchRawSite(siteKey: string): Promise<RawSite> {
     content: r.post_content || "",
   }));
 
-  const authorsRows = await query<{ ID: number; display_name: string }>(
-    siteKey,
+  const authorsRows = await q<{ ID: number; display_name: string }>(
     `SELECT ID, display_name FROM ${p}users`
   );
   const authors = new Map<number, string>();
   authorsRows.forEach((a) => authors.set(Number(a.ID), a.display_name || "Unknown"));
 
-  const catRows = await query<{ post_id: number; category: string }>(
-    siteKey,
+  const catRows = await q<{ post_id: number; category: string }>(
     `SELECT tr.object_id AS post_id, t.name AS category
      FROM ${p}term_relationships tr
      JOIN ${p}term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
@@ -77,8 +84,7 @@ export async function fetchRawSite(siteKey: string): Promise<RawSite> {
     categoriesByPost.set(Number(r.post_id), list);
   });
 
-  const kwRows = await query<{ post_id: number; meta_value: string }>(
-    siteKey,
+  const kwRows = await q<{ post_id: number; meta_value: string }>(
     `SELECT post_id, meta_value FROM ${p}postmeta
      WHERE meta_key IN ('rank_math_focus_keyword','_yoast_wpseo_focuskw','_aioseo_keywords','_keyword')
        AND meta_value IS NOT NULL AND meta_value <> ''`
@@ -90,8 +96,7 @@ export async function fetchRawSite(siteKey: string): Promise<RawSite> {
     }
   });
 
-  const statusRows = await query<{ status: string; count: number }>(
-    siteKey,
+  const statusRows = await q<{ status: string; count: number }>(
     `SELECT post_status AS status, COUNT(*) AS count
      FROM ${p}posts WHERE post_type='post' GROUP BY post_status`
   );
@@ -102,8 +107,7 @@ export async function fetchRawSite(siteKey: string): Promise<RawSite> {
 
   const totalPosts = statusCounts.reduce((a, s) => a + s.count, 0);
 
-  const commentRow = await query<{ count: number }>(
-    siteKey,
+  const commentRow = await q<{ count: number }>(
     `SELECT COUNT(*) AS count FROM ${p}comments`
   );
   const totalComments = Number(commentRow[0]?.count ?? 0);
