@@ -1,6 +1,10 @@
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
+if (!process.env.NEXTAUTH_SECRET && process.env.NODE_ENV === "production") {
+  throw new Error("NEXTAUTH_SECRET environment variable is not set. Add it in your Vercel dashboard.");
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
