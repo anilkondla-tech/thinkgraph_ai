@@ -16,7 +16,7 @@ function clean(value: string | undefined, fallback = ""): string {
 }
 
 function siteKeys(): string[] {
-  // 1. Explicit allow-list wins.
+  // 1. Explicit allow-list wins — set THINKGRAPH_SITES=key1,key2 to show multiple.
   const raw = clean(process.env.THINKGRAPH_SITES);
   if (raw) {
     return raw
@@ -24,20 +24,12 @@ function siteKeys(): string[] {
       .map((s) => s.trim())
       .filter(Boolean);
   }
-  // 2. Otherwise discover every site that has BOTH a HOST and USER defined.
-  //    This prevents unconfigured placeholder sites from appearing in the dropdown.
-  const discovered: string[] = [];
-  for (const key of Object.keys(process.env)) {
-    const m = key.match(/^SITE_(.+)_HOST$/);
-    if (m) {
-      const k = m[1].toLowerCase();
-      const host = clean(process.env[`SITE_${m[1]}_HOST`]);
-      const user = clean(process.env[`SITE_${m[1]}_USER`]);
-      if (host && user) discovered.push(k);
-    }
-  }
-  if (discovered.length) return Array.from(new Set(discovered)).sort();
-  // 3. Fallback — single demo key.
+  // 2. If a default site is specified, show only that one.
+  const defaultSite =
+    clean(process.env.THINKGRAPH_DEFAULT_SITE) ||
+    clean(process.env.DASHBOARD_DEFAULT_SITE);
+  if (defaultSite) return [defaultSite];
+  // 3. Fallback — single site.
   return ["techsprohub"];
 }
 
