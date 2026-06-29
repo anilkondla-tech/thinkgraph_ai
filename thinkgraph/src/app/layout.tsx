@@ -5,6 +5,9 @@ import Shell from "@/components/Shell";
 import Providers from "@/components/Providers";
 import { listSites } from "@/lib/data";
 import { getUserSiteConnections } from "@/lib/userSites";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { DEMO_SITE } from "@/lib/seed";
 
 export const metadata: Metadata = {
   title: "ThinkGraph AI — Content Knowledge Graph",
@@ -17,14 +20,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const userSites = getUserSiteConnections();
-  const sites = listSites(userSites);
+  const session = await getServerSession(authOptions);
+  // Unauthenticated visitors only see the demo site.
+  // Authenticated users see their connected site(s).
+  const userSites = session ? getUserSiteConnections() : [];
+  const sites = session ? listSites(userSites) : [DEMO_SITE];
   return (
     <html lang="en">
       <body>
         <Providers>
           <Suspense fallback={null}>
-            <Shell sites={sites}>{children}</Shell>
+            <Shell sites={sites} isAuthenticated={!!session}>{children}</Shell>
           </Suspense>
         </Providers>
       </body>

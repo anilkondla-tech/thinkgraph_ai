@@ -16,9 +16,11 @@ const NAV = [
 
 export default function Shell({
   sites,
+  isAuthenticated = false,
   children,
 }: {
   sites: SiteMeta[];
+  isAuthenticated?: boolean;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -105,7 +107,8 @@ export default function Shell({
           </div>
 
           <div className="ml-auto flex items-center gap-3">
-            {sites.length > 1 && (
+            {/* Site selector — only shown when authenticated */}
+            {isAuthenticated && sites.length > 1 ? (
               <div className="relative">
                 <select
                   value={currentSite}
@@ -121,7 +124,13 @@ export default function Shell({
                 </select>
                 <IconChevron className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
               </div>
-            )}
+            ) : !isAuthenticated ? (
+              /* Demo badge shown to unauthenticated visitors */
+              <span className="pill bg-amber/[0.12] text-amber ring-1 ring-amber/[0.2]">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber" />
+                Demo mode
+              </span>
+            ) : null}
             <button
               onClick={() => startTransition(() => router.refresh())}
               className="rounded-xl border border-white/[0.08] bg-ink-800 px-3.5 py-2 text-sm font-medium text-slate-300 transition hover:border-white/20 hover:text-white"
