@@ -11,46 +11,54 @@ function lcg(seed: number) {
 }
 
 const CATEGORIES: Record<string, string[]> = {
-  "AI & Machine Learning": [
-    "A Practical Guide to Retrieval-Augmented Generation",
-    "Fine-Tuning vs Prompt Engineering: What Actually Works",
-    "Building Your First AI Agent in an Afternoon",
-    "Vector Databases Explained for Builders",
-    "How LLM Context Windows Really Work",
-    "Evaluating AI Output Without Losing Your Mind",
-    "The Economics of Running Models in Production",
-    "Multi-Agent Systems: Hype vs Reality",
+  "How-To & Tutorials": [
+    "How to Speed Up Your WordPress Site in 10 Minutes",
+    "How to Set Up Google Analytics 4 on WordPress",
+    "How to Create a Custom Email with Your Domain",
+    "How to Back Up Your WordPress Site for Free",
+    "How to Fix the White Screen of Death in WordPress",
+    "How to Add a Contact Form Without a Plugin",
+    "How to Migrate WordPress to a New Host",
+    "How to Enable HTTPS on Any WordPress Site",
   ],
-  "Web Development": [
-    "Server Components Changed How I Build Apps",
-    "The State of CSS in 2026",
-    "Edge Functions: When and Why",
-    "TypeScript Patterns I Wish I Knew Earlier",
-    "Shipping Fast Without Breaking Things",
-    "A Calm Take on Framework Fatigue",
+  "Tech Reviews": [
+    "Best Budget Laptops for Students in 2026",
+    "Apple MacBook Air M3 Review: Is It Worth It?",
+    "Top 5 Mechanical Keyboards Under $100",
+    "Samsung Galaxy S25 vs iPhone 16: Full Comparison",
+    "Best Wireless Earbuds for Remote Workers",
+    "The Best Smart Home Devices of 2026",
+    "OnePlus 13 Long-Term Review",
   ],
-  "Cloud & DevOps": [
-    "Zero-Downtime Deploys on a Budget",
-    "Observability for Small Teams",
-    "Infrastructure as Code Without the Tears",
-    "Cutting Your Cloud Bill in Half",
+  "WordPress": [
+    "Best Free WordPress Themes for Blogs",
+    "Rank Math vs Yoast SEO: Which Is Better?",
+    "10 Must-Have WordPress Plugins for Bloggers",
+    "How to Monetize a WordPress Blog in 2026",
+    "WooCommerce vs Shopify: Which Should You Choose?",
+    "Best WordPress Hosting for Small Businesses",
   ],
-  Cybersecurity: [
-    "Threat Modeling for Indie Developers",
-    "Secrets Management Done Right",
-    "The Beginner's Guide to Zero Trust",
-    "Why Your API Keys Keep Leaking",
+  "SEO & Traffic": [
+    "How to Rank on Google in 2026: A Beginner's Guide",
+    "What Is Topical Authority and Why It Matters",
+    "Internal Linking Strategy That Actually Works",
+    "How to Find Low-Competition Keywords for Free",
+    "Google's Helpful Content Update: What You Need to Know",
+    "How to Get Traffic Without Backlinks",
   ],
-  Gadgets: [
-    "The Best Mechanical Keyboards This Year",
-    "E-Ink Tablets Are Finally Good",
-    "A Minimalist's Desk Setup",
+  "Artificial Intelligence": [
+    "Best AI Writing Tools Compared in 2026",
+    "How to Use ChatGPT for Blog Content",
+    "AI SEO Tools: Worth It or Hype?",
+    "How Google Detects AI-Generated Content",
+    "Top 5 AI Image Generators for Bloggers",
   ],
-  Startups: [
-    "Finding Your First 100 Users",
-    "Pricing a Micro-SaaS Without Guessing",
-    "The One-Person Software Company Playbook",
-    "When to Charge Before You Build",
+  "Make Money Online": [
+    "How to Start a Blog and Make Money in 2026",
+    "Best Affiliate Programs for Tech Bloggers",
+    "Display Ads vs Affiliate Marketing: Which Pays More?",
+    "How to Get Approved for Mediavine",
+    "Passive Income Ideas for Content Creators",
   ],
 };
 
@@ -65,8 +73,8 @@ function slugify(s: string): string {
 
 export const DEMO_SITE: SiteMeta = {
   key: "demo",
-  label: "Demo — Northstar Tech",
-  url: "https://demo.thinkgraph.app",
+  label: "TechsprohHub (demo)",
+  url: "https://techsprohub.com",
 };
 
 export function buildDemoRawSite(): RawSite {
