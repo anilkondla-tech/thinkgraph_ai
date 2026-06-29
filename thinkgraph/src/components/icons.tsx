@@ -73,6 +73,12 @@ export const IconBolt = (p: P) => (
   </svg>
 );
 
+export const IconChevron = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
+
 export const IconCheck = (p: P) => (
   <svg {...base} {...p}>
     <path d="M20 6 9 17l-5-5" />
