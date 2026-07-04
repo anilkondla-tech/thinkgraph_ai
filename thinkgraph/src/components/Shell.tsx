@@ -70,28 +70,46 @@ export default function Shell({
         </nav>
 
         <div className="mt-auto space-y-3">
-          {/* Upgrade CTA */}
-          <div className="rounded-xl border border-accent/[0.2] bg-gradient-to-br from-accent/[0.1] to-transparent p-3.5">
-            <div className="mb-1 flex items-center gap-1.5">
-              <IconSparkle className="h-3.5 w-3.5 text-accent-soft" />
-              <span className="text-[11px] font-semibold text-white">Upgrade to Pro</span>
+          {/* Workspace section */}
+          {!isAuthenticated ? (
+            /* Unauthenticated: prompt to sign in */
+            <div className="rounded-xl border border-amber/[0.25] bg-amber/[0.06] p-3.5">
+              <div className="mb-1 flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber animate-pulseglow" />
+                <span className="text-[11px] font-semibold text-amber">Demo workspace</span>
+              </div>
+              <p className="text-[10px] leading-relaxed text-slate-500 mb-2">
+                Sign in with Google to connect your own WordPress site and save it as a workspace.
+              </p>
+              <a
+                href="/login"
+                className="block rounded-lg bg-accent/[0.15] py-1.5 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.25]"
+              >
+                Sign in →
+              </a>
             </div>
-            <p className="text-[10px] leading-relaxed text-slate-500">
-              Unlock AI insights, gap detection, and priority scoring.
-            </p>
-            <Link
-              href="/onboarding"
-              className="mt-2 block rounded-lg bg-accent/[0.15] py-1.5 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.25]"
-            >
-              Connect site →
-            </Link>
-          </div>
-          <div className="card card-pad !p-3.5">
-            <div className="label-muted mb-1">Workspace</div>
-            <p className="text-xs leading-relaxed text-slate-400">
-              {sites.length} site{sites.length === 1 ? "" : "s"} connected
-            </p>
-          </div>
+          ) : (
+            /* Authenticated: show workspace list + connect CTA */
+            <>
+              <div className="rounded-xl border border-accent/[0.2] bg-gradient-to-br from-accent/[0.1] to-transparent p-3.5">
+                <div className="mb-1 flex items-center gap-1.5">
+                  <IconSparkle className="h-3.5 w-3.5 text-accent-soft" />
+                  <span className="text-[11px] font-semibold text-white">Workspaces</span>
+                </div>
+                <p className="text-[10px] leading-relaxed text-slate-500 mb-2">
+                  {sites.length === 1 && sites[0].key === "demo"
+                    ? "No sites connected yet."
+                    : `${sites.length} site${sites.length === 1 ? "" : "s"} connected.`}
+                </p>
+                <Link
+                  href="/onboarding"
+                  className="block rounded-lg bg-accent/[0.15] py-1.5 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.25]"
+                >
+                  + Connect WordPress site
+                </Link>
+              </div>
+            </>
+          )}
           <p className="px-2 text-[10px] leading-relaxed text-slate-600">
             ThinkGraph AI · MVP. Insights are advisory — validate before publishing.
           </p>
@@ -137,7 +155,16 @@ export default function Shell({
             >
               {pending ? "…" : "Refresh"}
             </button>
-            <UserMenu />
+            {!isAuthenticated ? (
+              <a
+                href="/login"
+                className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white shadow-glow transition hover:bg-accent-glow"
+              >
+                Sign in
+              </a>
+            ) : (
+              <UserMenu />
+            )}
           </div>
         </header>
 

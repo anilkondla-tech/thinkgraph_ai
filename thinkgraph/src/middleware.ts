@@ -8,13 +8,14 @@ export default withAuth(
   {
     callbacks: {
       authorized({ req, token }) {
-        const { pathname, searchParams } = req.nextUrl;
+        const { pathname } = req.nextUrl;
         // Always allow: login page, NextAuth internals
         if (pathname === "/login") return true;
-        // Allow demo mode without sign-in
-        if (searchParams.get("demo") === "true") return true;
-        // Require a valid JWT session for everything else
-        return !!token;
+        // Onboarding requires authentication (connecting a real site)
+        if (pathname.startsWith("/onboarding")) return !!token;
+        // All other routes are publicly accessible — unauthenticated visitors
+        // see the demo workspace; layout.tsx handles the data accordingly.
+        return true;
       },
     },
   }

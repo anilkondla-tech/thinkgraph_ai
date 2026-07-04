@@ -1,11 +1,18 @@
 import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
 import mysql from "mysql2/promise";
 import { encrypt, decrypt } from "@/lib/crypto";
+import { authOptions } from "@/lib/auth";
 import type { SiteConnection } from "@/lib/sites";
 
 const COOKIE = "tg_user_sites";
 
 export async function POST(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return Response.json({ error: "Authentication required. Please sign in first." }, { status: 401 });
+  }
+
   let body: Record<string, string>;
   try {
     body = await req.json();
@@ -93,6 +100,11 @@ export async function POST(req: Request) {
 
 /** Remove a user-defined site by key. */
 export async function DELETE(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return Response.json({ error: "Authentication required." }, { status: 401 });
+  }
+
   const { key } = await req.json();
   if (!key) return Response.json({ error: "key required" }, { status: 400 });
 
