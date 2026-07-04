@@ -35,7 +35,7 @@ export default function AiInsight({
   };
 
   return (
-    <div className="card card-pad relative overflow-hidden animate-fade-up">
+    <div className="card card-pad relative overflow-hidden animate-fade-up min-h-[140px]">
       <div
         className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-accent/20 blur-3xl"
         aria-hidden
@@ -53,7 +53,7 @@ export default function AiInsight({
       </div>
 
       {insight ? (
-        <p className="text-sm leading-relaxed text-slate-300">{insight}</p>
+        <p className="text-sm leading-relaxed text-slate-300 min-h-[60px]">{insight}</p>
       ) : aiEnabled ? (
         <div className="flex flex-col items-start gap-3">
           <p className="text-sm text-slate-400">

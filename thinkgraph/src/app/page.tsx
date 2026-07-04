@@ -6,6 +6,8 @@ import { getSiteAnalytics } from "@/lib/data";
 import { getUserSiteConnections } from "@/lib/userSites";
 import { BarList, Donut, WeeklyTrend } from "@/components/charts";
 import AiInsight from "@/components/AiInsight";
+import OrphanList from "@/components/OrphanList";
+import ArticlesByCluster from "@/components/ArticlesByCluster";
 import { PageHeader, ScoreRing, SourceBadge, Stat } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +29,20 @@ export default async function OverviewPage({
   const userSites = await getUserSiteConnections();
   const a = await getSiteAnalytics(site, { userSites });
   const t = a.totals;
+
+  // Group published nodes by category for the articles section
+  const publishedNodes = a.graph.nodes.filter((n) => n.status === "publish");
+  const clusterMap = new Map<string, typeof publishedNodes>();
+  publishedNodes.forEach((n) => {
+    const arr = clusterMap.get(n.category) ?? [];
+    arr.push(n);
+    clusterMap.set(n.category, arr);
+  });
+  const clusterGroups = Array.from(clusterMap.entries())
+    .sort((a, b) => b[1].length - a[1].length)
+    .map(([category, nodes]) => ({ category, nodes }));
+
+  const orphanNodes = a.graph.nodes.filter((n) => n.orphan && n.status === "publish");
 
   return (
     <div>
@@ -54,12 +70,7 @@ export default async function OverviewPage({
             value={t.internalLinks}
             hint={`${(t.publishedPosts ? t.internalLinks / t.publishedPosts : 0).toFixed(2)} per post`}
           />
-          <Stat
-            label="Orphan posts"
-            value={t.orphans}
-            tone={t.orphans > 0 ? "bad" : "good"}
-            hint="No inbound internal links"
-          />
+          <OrphanList orphans={orphanNodes} siteUrl={a.site.url} />
           <Stat
             label="Missing keywords"
             value={t.missingKeywords}
@@ -89,9 +100,11 @@ export default async function OverviewPage({
           <WeeklyTrend data={a.postsByWeek} />
         </div>
         <div className="card card-pad">
-          <h3 className="mb-3 text-sm font-semibold text-white">Posts by status</h3>
+          <h3 className="mb-3 text-sm font-semibold text-white">Posts by status (excl. published)</h3>
           <Donut
-            data={a.statusBreakdown.map((s) => ({ label: s.status, value: s.count }))}
+            data={a.statusBreakdown
+              .filter((s) => s.status !== "publish")
+              .map((s) => ({ label: s.status, value: s.count }))}
           />
         </div>
       </div>
@@ -127,6 +140,11 @@ export default async function OverviewPage({
             )}
           </ul>
         </div>
+      </div>
+
+      {/* Articles by Cluster */}
+      <div className="mt-4">
+        <ArticlesByCluster groups={clusterGroups} siteUrl={a.site.url} />
       </div>
     </div>
   );
