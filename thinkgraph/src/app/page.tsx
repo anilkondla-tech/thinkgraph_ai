@@ -5,7 +5,6 @@ import { authOptions } from "@/lib/auth";
 import { getSiteAnalytics } from "@/lib/data";
 import { getUserSiteConnections } from "@/lib/userSites";
 import { BarList, Donut, WeeklyTrend } from "@/components/charts";
-import AiInsight from "@/components/AiInsight";
 import OrphanList from "@/components/OrphanList";
 import ArticlesByCluster from "@/components/ArticlesByCluster";
 import { PageHeader, ScoreRing, SourceBadge, Stat } from "@/components/ui";
@@ -81,16 +80,7 @@ export default async function OverviewPage({
         </div>
       </div>
 
-      {/* AI insight */}
-      <div className="mt-4">
-        <AiInsight
-          siteKey={a.site.key}
-          aiEnabled={a.aiEnabled}
-          initialInsight={a.aiInsight}
-        />
-      </div>
-
-      {/* Charts */}
+      {/* Charts */}}
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="card card-pad lg:col-span-2">
           <div className="mb-3 flex items-center justify-between">
