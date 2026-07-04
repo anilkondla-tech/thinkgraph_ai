@@ -147,12 +147,12 @@ export default function LoginPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Link
+          <a
             href="/?site=demo"
             className="text-sm font-medium text-slate-400 transition-colors hover:text-white"
           >
             Live demo
-          </Link>
+          </a>
         </div>
       </header>
 
@@ -198,13 +198,13 @@ export default function LoginPage() {
                   <GoogleIcon />
                   Sign in with Google
                 </button>
-                <Link
+                <a
                   href="/?site=demo"
                   className="inline-flex items-center gap-2 rounded-xl border border-white/[0.1] px-5 py-3 text-sm font-semibold text-slate-300 transition hover:border-white/[0.2] hover:text-white"
                 >
                   Explore demo
                   <span aria-hidden className="text-slate-500">→</span>
-                </Link>
+                </a>
               </div>
 
               <p className="text-xs text-slate-600">
