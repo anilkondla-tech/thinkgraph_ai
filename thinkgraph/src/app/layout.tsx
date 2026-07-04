@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { headers } from "next/headers";
 import "./globals.css";
 import Shell from "@/components/Shell";
 import Providers from "@/components/Providers";
@@ -15,23 +16,34 @@ export const metadata: Metadata = {
     "See your content as a living knowledge graph. AI-ranked actions for topical authority, internal linking, and AEO.",
 };
 
+// Pages that have their own full-page layout — skip the Shell for these.
+const BARE_ROUTES = ["/login", "/onboarding"];
+
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = headers().get("x-pathname") ?? "";
+  const isBare = BARE_ROUTES.some((r) => pathname === r || pathname.startsWith(r + "/"));
+
   const session = await getServerSession(authOptions);
-  // listSites always includes Demo + the user's own connected sites.
-  // For unauthenticated visitors we short-circuit to [DEMO_SITE].
-  const userSites = session ? await getUserSiteConnections() : [];
-  const sites = session ? listSites(userSites) : [DEMO_SITE];
+  const userSites = !isBare && session ? await getUserSiteConnections() : [];
+  const sites = !isBare && session ? listSites(userSites) : [DEMO_SITE];
+
   return (
     <html lang="en">
       <body>
         <Providers>
-          <Suspense fallback={null}>
-            <Shell sites={sites} isAuthenticated={!!session}>{children}</Shell>
-          </Suspense>
+          {isBare ? (
+            children
+          ) : (
+            <Suspense fallback={null}>
+              <Shell sites={sites} isAuthenticated={!!session}>
+                {children}
+              </Shell>
+            </Suspense>
+          )}
         </Providers>
       </body>
     </html>

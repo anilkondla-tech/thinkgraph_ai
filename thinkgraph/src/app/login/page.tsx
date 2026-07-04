@@ -148,17 +148,11 @@ export default function LoginPage() {
         </div>
         <div className="flex items-center gap-3">
           <Link
-            href="/?demo=true"
+            href="/"
             className="text-sm font-medium text-slate-400 transition-colors hover:text-white"
           >
             Live demo
           </Link>
-          <button
-            onClick={() => signIn("google", { callbackUrl: "/" })}
-            className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white shadow-glow transition hover:bg-accent-glow"
-          >
-            Sign in
-          </button>
         </div>
       </header>
 
@@ -286,26 +280,7 @@ export default function LoginPage() {
           </div>
         </section>
 
-        {/* ── Bottom CTA band ── */}
-        <section className="mx-auto mb-20 w-full max-w-2xl px-6 text-center lg:px-14">
-          <div className="rounded-3xl border border-accent/[0.15] bg-gradient-to-br from-accent/[0.1] to-transparent p-10">
-            <IconSparkle className="mx-auto mb-4 h-8 w-8 text-accent-soft" />
-            <h2 className="mb-3 text-2xl font-bold text-white">
-              Ready to see your content graph?
-            </h2>
-            <p className="mb-6 text-sm text-slate-400">
-              Connect your WordPress site in 30 seconds and get an instant
-              knowledge graph with AI-powered recommendations.
-            </p>
-            <button
-              onClick={() => signIn("google", { callbackUrl: "/" })}
-              className="inline-flex items-center gap-3 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-ink-950 shadow-lg transition hover:bg-slate-100"
-            >
-              <GoogleIcon />
-              Get started — it's free
-            </button>
-          </div>
-        </section>
+
       </main>
 
       {/* Footer */}

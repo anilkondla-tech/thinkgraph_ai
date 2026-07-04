@@ -2,8 +2,12 @@ import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
 export default withAuth(
-  function middleware() {
-    return NextResponse.next();
+  function middleware(req) {
+    const res = NextResponse.next();
+    // Let the root layout know the current pathname so it can skip the
+    // Shell for pages that have their own full-page layout (login, onboarding).
+    res.headers.set("x-pathname", req.nextUrl.pathname);
+    return res;
   },
   {
     callbacks: {
