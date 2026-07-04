@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { getSiteAnalytics } from "@/lib/data";
 import { getUserSiteConnections } from "@/lib/userSites";
 import { BarList, Donut, WeeklyTrend } from "@/components/charts";
@@ -12,7 +15,15 @@ export default async function OverviewPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  const session = await getServerSession(authOptions);
   const site = typeof searchParams.site === "string" ? searchParams.site : undefined;
+
+  // Unauthenticated visitors with no explicit site selected → show the landing page.
+  // Passing ?site=demo (via the "Live demo" button) bypasses this redirect.
+  if (!session && !site) {
+    redirect("/login");
+  }
+
   const userSites = await getUserSiteConnections();
   const a = await getSiteAnalytics(site, { userSites });
   const t = a.totals;
