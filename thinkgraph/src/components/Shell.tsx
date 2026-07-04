@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useTransition } from "react";
+import { useTransition, useState, useRef, useEffect } from "react";
 import type { SiteMeta } from "@/lib/types";
-import { Logo, IconGrid, IconGraph, IconLayers, IconBolt, IconChevron, IconSparkle, IconDatabase } from "./icons";
+import { Logo, IconGrid, IconGraph, IconLayers, IconBolt, IconChevron, IconSparkle, IconDatabase, IconCheck } from "./icons";
 import UserMenu from "./UserMenu";
 
 const NAV = [
@@ -28,6 +28,19 @@ export default function Shell({
   const params = useSearchParams();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [sitePickerOpen, setSitePickerOpen] = useState(false);
+  const sitePickerRef = useRef<HTMLDivElement>(null);
+
+  // Close site picker on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (sitePickerRef.current && !sitePickerRef.current.contains(e.target as Node)) {
+        setSitePickerOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const currentSite = params.get("site") ?? sites[0]?.key ?? "";
 
@@ -126,22 +139,67 @@ export default function Shell({
           </div>
 
           <div className="ml-auto flex items-center gap-3">
-            {/* Site selector — only shown when authenticated */}
-            {isAuthenticated && sites.length > 1 ? (
-              <div className="relative">
-                <select
-                  value={currentSite}
-                  onChange={(e) => onSiteChange(e.target.value)}
-                  className="appearance-none rounded-xl border border-white/[0.08] bg-ink-800 py-2 pl-3.5 pr-9 text-sm font-medium text-slate-100 outline-none transition hover:border-white/20 focus:border-accent"
-                  aria-label="Select site"
+            {/* Site picker — custom dropdown shown when authenticated */}
+            {isAuthenticated && sites.length >= 1 ? (
+              <div className="relative" ref={sitePickerRef}>
+                <button
+                  onClick={() => setSitePickerOpen((v) => !v)}
+                  aria-haspopup="listbox"
+                  aria-expanded={sitePickerOpen}
+                  className="flex min-w-[180px] max-w-[240px] items-center gap-2.5 rounded-xl border border-white/[0.08] bg-ink-800 py-2 pl-3.5 pr-3 text-sm font-medium text-slate-100 transition hover:border-white/20"
                 >
-                  {sites.map((s) => (
-                    <option key={s.key} value={s.key}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-                <IconChevron className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                  <IconDatabase className="h-4 w-4 shrink-0 text-slate-500" />
+                  <span className="flex-1 truncate text-left">
+                    {sites.find((s) => s.key === currentSite)?.label ?? currentSite}
+                  </span>
+                  <IconChevron
+                    className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${
+                      sitePickerOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {sitePickerOpen && (
+                  <div
+                    role="listbox"
+                    aria-label="Select workspace"
+                    className="absolute right-0 top-full z-50 mt-2 min-w-full w-max overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-800 shadow-card"
+                  >
+                    {sites.map((s) => (
+                      <button
+                        key={s.key}
+                        role="option"
+                        aria-selected={s.key === currentSite}
+                        onClick={() => {
+                          onSiteChange(s.key);
+                          setSitePickerOpen(false);
+                        }}
+                        className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-white/[0.04] ${
+                          s.key === currentSite
+                            ? "bg-accent/[0.08] text-white"
+                            : "text-slate-400 hover:text-slate-100"
+                        }`}
+                      >
+                        <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+                          {s.key === currentSite && (
+                            <IconCheck className="h-3.5 w-3.5 text-accent-soft" />
+                          )}
+                        </span>
+                        <span className="truncate">{s.label}</span>
+                      </button>
+                    ))}
+                    <div className="border-t border-white/[0.06] p-1.5">
+                      <Link
+                        href="/workspaces"
+                        onClick={() => setSitePickerOpen(false)}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs text-slate-500 transition hover:bg-white/[0.04] hover:text-slate-300"
+                      >
+                        <IconDatabase className="h-3.5 w-3.5 shrink-0" />
+                        Manage workspaces
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : !isAuthenticated ? (
               /* Demo badge shown to unauthenticated visitors */
