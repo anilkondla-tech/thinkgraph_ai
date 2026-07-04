@@ -148,7 +148,7 @@ export default function LoginPage() {
         </div>
         <div className="flex items-center gap-3">
           <Link
-            href="/?site=demo"
+            href="/"
             className="text-sm font-medium text-slate-400 transition-colors hover:text-white"
           >
             Live demo
@@ -199,7 +199,7 @@ export default function LoginPage() {
                   Sign in with Google
                 </button>
                 <Link
-                  href="/?demo=true"
+                  href="/"
                   className="inline-flex items-center gap-2 rounded-xl border border-white/[0.1] px-5 py-3 text-sm font-semibold text-slate-300 transition hover:border-white/[0.2] hover:text-white"
                 >
                   Explore demo
