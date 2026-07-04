@@ -137,11 +137,11 @@ export default function LoginPage() {
 
       {/* ── Top nav ── */}
       <header className="relative z-10 flex items-center justify-between px-6 py-5 lg:px-14">
-        <div className="flex items-center gap-2.5">
-          <Logo className="h-8 w-8" />
+        <div className="flex items-center gap-3.5">
+          <Logo className="h-11 w-11" />
           <div className="leading-tight">
-            <div className="text-[15px] font-semibold text-white">ThinkGraph</div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent-soft">
+            <div className="text-[20px] font-semibold text-white">ThinkGraph</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-soft">
               AI
             </div>
           </div>
