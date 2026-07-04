@@ -11,7 +11,7 @@ export default async function WorkspacesPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
 
-  const raw = getUserSiteConnections();
+  const raw = await getUserSiteConnections();
   // Strip passwords before passing to the client component
   const safeSites = raw.map(({ password: _pw, ...rest }) => rest);
 

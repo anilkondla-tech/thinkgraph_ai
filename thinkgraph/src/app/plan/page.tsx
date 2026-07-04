@@ -12,7 +12,7 @@ export default async function PlanPage({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const site = typeof searchParams.site === "string" ? searchParams.site : undefined;
-  const userSites = getUserSiteConnections();
+  const userSites = await getUserSiteConnections();
   // Try AI on first load so the plan is richest; falls back gracefully.
   const a = await getSiteAnalytics(site, { withAi: true, userSites });
 

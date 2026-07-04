@@ -23,7 +23,7 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions);
   // Unauthenticated visitors only see the demo site.
   // Authenticated users see their connected site(s).
-  const userSites = session ? getUserSiteConnections() : [];
+  const userSites = session ? await getUserSiteConnections() : [];
   const sites = session ? listSites(userSites) : [DEMO_SITE];
   return (
     <html lang="en">

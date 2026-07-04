@@ -11,7 +11,7 @@ export default async function GraphPage({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const site = typeof searchParams.site === "string" ? searchParams.site : undefined;
-  const userSites = getUserSiteConnections();
+  const userSites = await getUserSiteConnections();
   const a = await getSiteAnalytics(site, { userSites });
 
   return (

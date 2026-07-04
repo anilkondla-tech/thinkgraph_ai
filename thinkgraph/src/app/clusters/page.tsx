@@ -23,7 +23,7 @@ export default async function ClustersPage({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const site = typeof searchParams.site === "string" ? searchParams.site : undefined;
-  const userSites = getUserSiteConnections();
+  const userSites = await getUserSiteConnections();
   const a = await getSiteAnalytics(site, { userSites });
   const thin = a.clusters.filter((c) => c.health === "thin").length;
 
