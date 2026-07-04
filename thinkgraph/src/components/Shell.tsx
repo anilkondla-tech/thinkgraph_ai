@@ -84,45 +84,54 @@ export default function Shell({
         </nav>
 
         <div className="mt-auto space-y-3">
-          {/* Workspace section */}
           {!isAuthenticated ? (
-            /* Unauthenticated: prompt to sign in */
-            <div className="rounded-xl border border-amber/[0.25] bg-amber/[0.06] p-3.5">
-              <div className="mb-1 flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber animate-pulseglow" />
-                <span className="text-[11px] font-semibold text-amber">Demo workspace</span>
-              </div>
-              <p className="text-[10px] leading-relaxed text-slate-500 mb-2">
-                Sign in with Google to connect your own WordPress site and save it as a workspace.
-              </p>
-              <a
-                href="/login"
-                className="block rounded-lg bg-accent/[0.15] py-1.5 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.25]"
-              >
-                Sign in →
-              </a>
-            </div>
-          ) : (
-            /* Authenticated: show workspace list + connect CTA */
+            /* Demo mode: workspace card + home/sign-in actions (matches logged-in style) */
             <>
               <div className="rounded-xl border border-accent/[0.2] bg-gradient-to-br from-accent/[0.1] to-transparent p-3.5">
                 <div className="mb-1 flex items-center gap-1.5">
                   <IconSparkle className="h-3.5 w-3.5 text-accent-soft" />
-                  <span className="text-[11px] font-semibold text-white">Workspaces</span>
+                  <span className="text-[11px] font-semibold text-white">Workspace</span>
                 </div>
                 <p className="text-[10px] leading-relaxed text-slate-500 mb-2">
-                  {sites.length === 1 && sites[0].key === "demo"
-                    ? "No sites connected yet."
-                    : `${sites.length} site${sites.length === 1 ? "" : "s"} connected.`}
+                  Viewing demo data. Sign in to connect your own site.
                 </p>
-                <Link
-                  href="/onboarding"
-                  className="block rounded-lg bg-accent/[0.15] py-1.5 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.25]"
+                <a
+                  href="/login"
+                  className="block rounded-lg bg-accent py-1.5 text-center text-[11px] font-semibold text-white shadow-glow transition hover:bg-accent-glow"
                 >
-                  + Connect WordPress site
-                </Link>
+                  Sign in with Google
+                </a>
               </div>
+              <a
+                href="/login"
+                className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs text-slate-500 transition hover:bg-white/[0.04] hover:text-slate-300"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                Home
+              </a>
             </>
+          ) : (
+            /* Authenticated: workspace list + connect CTA */
+            <div className="rounded-xl border border-accent/[0.2] bg-gradient-to-br from-accent/[0.1] to-transparent p-3.5">
+              <div className="mb-1 flex items-center gap-1.5">
+                <IconSparkle className="h-3.5 w-3.5 text-accent-soft" />
+                <span className="text-[11px] font-semibold text-white">Workspaces</span>
+              </div>
+              <p className="text-[10px] leading-relaxed text-slate-500 mb-2">
+                {sites.length === 1 && sites[0].key === "demo"
+                  ? "No sites connected yet."
+                  : `${sites.length} site${sites.length === 1 ? "" : "s"} connected.`}
+              </p>
+              <Link
+                href="/onboarding"
+                className="block rounded-lg bg-accent/[0.15] py-1.5 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.25]"
+              >
+                + Connect WordPress site
+              </Link>
+            </div>
           )}
           <p className="px-2 text-[10px] leading-relaxed text-slate-600">
             ThinkGraph AI · MVP. Insights are advisory — validate before publishing.
@@ -139,75 +148,71 @@ export default function Shell({
           </div>
 
           <div className="ml-auto flex items-center gap-3">
-            {/* Site picker — custom dropdown shown when authenticated */}
-            {isAuthenticated && sites.length >= 1 ? (
-              <div className="relative" ref={sitePickerRef}>
-                <button
-                  onClick={() => setSitePickerOpen((v) => !v)}
-                  aria-haspopup="listbox"
-                  aria-expanded={sitePickerOpen}
-                  className="flex min-w-[180px] max-w-[240px] items-center gap-2.5 rounded-xl border border-white/[0.08] bg-ink-800 py-2 pl-3.5 pr-3 text-sm font-medium text-slate-100 transition hover:border-white/20"
-                >
-                  <IconDatabase className="h-4 w-4 shrink-0 text-slate-500" />
-                  <span className="flex-1 truncate text-left">
-                    {sites.find((s) => s.key === currentSite)?.label ?? currentSite}
-                  </span>
+            {/* Site picker — shown for ALL users (demo or authenticated) */}
+            <div className="relative" ref={sitePickerRef}>
+              <button
+                onClick={() => isAuthenticated && setSitePickerOpen((v) => !v)}
+                aria-haspopup={isAuthenticated ? "listbox" : undefined}
+                aria-expanded={isAuthenticated ? sitePickerOpen : undefined}
+                className={`flex min-w-[180px] max-w-[240px] items-center gap-2.5 rounded-xl border border-white/[0.08] bg-ink-800 py-2 pl-3.5 pr-3 text-sm font-medium text-slate-100 transition ${
+                  isAuthenticated ? "hover:border-white/20 cursor-pointer" : "cursor-default"
+                }`}
+              >
+                <IconDatabase className="h-4 w-4 shrink-0 text-slate-500" />
+                <span className="flex-1 truncate text-left">
+                  {sites.find((s) => s.key === currentSite)?.label ?? currentSite}
+                </span>
+                {isAuthenticated && (
                   <IconChevron
                     className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${
                       sitePickerOpen ? "rotate-180" : ""
                     }`}
                   />
-                </button>
-
-                {sitePickerOpen && (
-                  <div
-                    role="listbox"
-                    aria-label="Select workspace"
-                    className="absolute right-0 top-full z-50 mt-2 min-w-full w-max overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-800 shadow-card"
-                  >
-                    {sites.map((s) => (
-                      <button
-                        key={s.key}
-                        role="option"
-                        aria-selected={s.key === currentSite}
-                        onClick={() => {
-                          onSiteChange(s.key);
-                          setSitePickerOpen(false);
-                        }}
-                        className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-white/[0.04] ${
-                          s.key === currentSite
-                            ? "bg-accent/[0.08] text-white"
-                            : "text-slate-400 hover:text-slate-100"
-                        }`}
-                      >
-                        <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-                          {s.key === currentSite && (
-                            <IconCheck className="h-3.5 w-3.5 text-accent-soft" />
-                          )}
-                        </span>
-                        <span className="truncate">{s.label}</span>
-                      </button>
-                    ))}
-                    <div className="border-t border-white/[0.06] p-1.5">
-                      <Link
-                        href="/workspaces"
-                        onClick={() => setSitePickerOpen(false)}
-                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs text-slate-500 transition hover:bg-white/[0.04] hover:text-slate-300"
-                      >
-                        <IconDatabase className="h-3.5 w-3.5 shrink-0" />
-                        Manage workspaces
-                      </Link>
-                    </div>
-                  </div>
                 )}
-              </div>
-            ) : !isAuthenticated ? (
-              /* Demo badge shown to unauthenticated visitors */
-              <span className="pill bg-amber/[0.12] text-amber ring-1 ring-amber/[0.2]">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber" />
-                Demo mode
-              </span>
-            ) : null}
+              </button>
+
+              {isAuthenticated && sitePickerOpen && (
+                <div
+                  role="listbox"
+                  aria-label="Select workspace"
+                  className="absolute right-0 top-full z-50 mt-2 min-w-full w-max overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-800 shadow-card"
+                >
+                  {sites.map((s) => (
+                    <button
+                      key={s.key}
+                      role="option"
+                      aria-selected={s.key === currentSite}
+                      onClick={() => {
+                        onSiteChange(s.key);
+                        setSitePickerOpen(false);
+                      }}
+                      className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-white/[0.04] ${
+                        s.key === currentSite
+                          ? "bg-accent/[0.08] text-white"
+                          : "text-slate-400 hover:text-slate-100"
+                      }`}
+                    >
+                      <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+                        {s.key === currentSite && (
+                          <IconCheck className="h-3.5 w-3.5 text-accent-soft" />
+                        )}
+                      </span>
+                      <span className="truncate">{s.label}</span>
+                    </button>
+                  ))}
+                  <div className="border-t border-white/[0.06] p-1.5">
+                    <Link
+                      href="/workspaces"
+                      onClick={() => setSitePickerOpen(false)}
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs text-slate-500 transition hover:bg-white/[0.04] hover:text-slate-300"
+                    >
+                      <IconDatabase className="h-3.5 w-3.5 shrink-0" />
+                      Manage workspaces
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
             <button
               onClick={() => startTransition(() => router.refresh())}
               className="rounded-xl border border-white/[0.08] bg-ink-800 px-3.5 py-2 text-sm font-medium text-slate-300 transition hover:border-white/20 hover:text-white"
