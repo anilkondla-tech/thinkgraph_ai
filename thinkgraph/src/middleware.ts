@@ -3,11 +3,14 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    const res = NextResponse.next();
-    // Let the root layout know the current pathname so it can skip the
-    // Shell for pages that have their own full-page layout (login, onboarding).
-    res.headers.set("x-pathname", req.nextUrl.pathname);
-    return res;
+    // Forward the pathname as a REQUEST header so server components can read
+    // it via headers().get("x-pathname"). Setting it on the response headers
+    // does NOT work — Next.js server components read request headers only.
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set("x-pathname", req.nextUrl.pathname);
+    return NextResponse.next({
+      request: { headers: requestHeaders },
+    });
   },
   {
     callbacks: {

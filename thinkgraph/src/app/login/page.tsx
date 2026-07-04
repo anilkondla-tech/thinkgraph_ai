@@ -148,7 +148,7 @@ export default function LoginPage() {
         </div>
         <div className="flex items-center gap-3">
           <Link
-            href="/"
+            href="/?site=demo"
             className="text-sm font-medium text-slate-400 transition-colors hover:text-white"
           >
             Live demo
