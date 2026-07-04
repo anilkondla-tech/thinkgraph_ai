@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import type { SiteMeta } from "@/lib/types";
-import { Logo, IconGrid, IconGraph, IconLayers, IconBolt, IconChevron, IconSparkle } from "./icons";
+import { Logo, IconGrid, IconGraph, IconLayers, IconBolt, IconChevron, IconSparkle, IconDatabase } from "./icons";
 import UserMenu from "./UserMenu";
 
 const NAV = [
@@ -12,6 +12,7 @@ const NAV = [
   { href: "/graph", label: "Content Graph", icon: IconGraph },
   { href: "/clusters", label: "Clusters & Gaps", icon: IconLayers },
   { href: "/plan", label: "Action Plan", icon: IconBolt },
+  { href: "/workspaces", label: "Workspaces", icon: IconDatabase },
 ];
 
 export default function Shell({

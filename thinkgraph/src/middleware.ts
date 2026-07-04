@@ -11,8 +11,8 @@ export default withAuth(
         const { pathname } = req.nextUrl;
         // Always allow: login page, NextAuth internals
         if (pathname === "/login") return true;
-        // Onboarding requires authentication (connecting a real site)
-        if (pathname.startsWith("/onboarding")) return !!token;
+        // Onboarding and workspaces require authentication
+        if (pathname.startsWith("/onboarding") || pathname.startsWith("/workspaces")) return !!token;
         // All other routes are publicly accessible — unauthenticated visitors
         // see the demo workspace; layout.tsx handles the data accordingly.
         return true;

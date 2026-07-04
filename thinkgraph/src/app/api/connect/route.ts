@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { label, host, port, user, password, database, prefix = "wp_" } = body;
+  const { label, host, port, user, password, database, prefix = "wp_", keepPassword } = body;
 
   if (!host || !user || !database) {
     return Response.json(
@@ -29,6 +29,25 @@ export async function POST(req: Request) {
     );
   }
 
+  // Read existing user sites from the cookie early so we can resolve the stored password
+  const cookieStore = cookies();
+  let existing: SiteConnection[] = [];
+  try {
+    const raw = cookieStore.get(COOKIE)?.value;
+    if (raw) existing = JSON.parse(decrypt(raw));
+  } catch {
+    /* start fresh on corrupt cookie */
+  }
+
+  // Derive key to find any existing entry
+  const key = `user_${host.replace(/[^a-z0-9]/gi, "_")}_${database.replace(/[^a-z0-9]/gi, "_")}`;
+
+  // If keepPassword is "true" and this site already exists, reuse its stored password
+  const resolvedPassword =
+    keepPassword === "true" && !password
+      ? (existing.find((s) => s.key === key)?.password ?? "")
+      : (password ?? "");
+
   // Test the MySQL connection
   let connection: mysql.Connection | null = null;
   try {
@@ -36,7 +55,7 @@ export async function POST(req: Request) {
       host,
       port: Number(port ?? 3306),
       user,
-      password: password ?? "",
+      password: resolvedPassword,
       database,
       connectTimeout: 8_000,
     });
@@ -55,18 +74,7 @@ export async function POST(req: Request) {
     }
   }
 
-  // Read existing user sites from the cookie
-  const cookieStore = cookies();
-  let existing: SiteConnection[] = [];
-  try {
-    const raw = cookieStore.get(COOKIE)?.value;
-    if (raw) existing = JSON.parse(decrypt(raw));
-  } catch {
-    /* start fresh on corrupt cookie */
-  }
-
-  // Upsert: replace any site with the same host+database, or append
-  const key = `user_${host.replace(/[^a-z0-9]/gi, "_")}_${database.replace(/[^a-z0-9]/gi, "_")}`;
+  // Upsert: replace any site with the same key, or append
   const newSite: SiteConnection = {
     key,
     label: (label || host).slice(0, 80),
@@ -74,7 +82,7 @@ export async function POST(req: Request) {
     host,
     port: Number(port ?? 3306),
     user,
-    password: password ?? "",
+    password: resolvedPassword,
     database,
     prefix,
   };
