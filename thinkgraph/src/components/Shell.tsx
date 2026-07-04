@@ -85,34 +85,22 @@ export default function Shell({
 
         <div className="mt-auto space-y-3">
           {!isAuthenticated ? (
-            /* Demo mode: workspace card + home/sign-in actions (matches logged-in style) */
-            <>
-              <div className="rounded-xl border border-accent/[0.2] bg-gradient-to-br from-accent/[0.1] to-transparent p-3.5">
-                <div className="mb-1 flex items-center gap-1.5">
-                  <IconSparkle className="h-3.5 w-3.5 text-accent-soft" />
-                  <span className="text-[11px] font-semibold text-white">Workspace</span>
-                </div>
-                <p className="text-[10px] leading-relaxed text-slate-500 mb-2">
-                  Viewing demo data. Sign in to connect your own site.
-                </p>
-                <a
-                  href="/login"
-                  className="block rounded-lg bg-accent py-1.5 text-center text-[11px] font-semibold text-white shadow-glow transition hover:bg-accent-glow"
-                >
-                  Sign in with Google
-                </a>
+            /* Demo mode — identical card structure to authenticated */
+            <div className="rounded-xl border border-accent/[0.2] bg-gradient-to-br from-accent/[0.1] to-transparent p-3.5">
+              <div className="mb-1 flex items-center gap-1.5">
+                <IconSparkle className="h-3.5 w-3.5 text-accent-soft" />
+                <span className="text-[11px] font-semibold text-white">Workspace</span>
               </div>
+              <p className="text-[10px] leading-relaxed text-slate-500 mb-2">
+                Demo workspace · sign in to connect your own site.
+              </p>
               <a
                 href="/login"
-                className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs text-slate-500 transition hover:bg-white/[0.04] hover:text-slate-300"
+                className="block rounded-lg bg-accent/[0.15] py-1.5 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.25]"
               >
-                <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  <polyline points="9 22 9 12 15 12 15 22" />
-                </svg>
-                Home
+                Sign in →
               </a>
-            </>
+            </div>
           ) : (
             /* Authenticated: workspace list + connect CTA */
             <div className="rounded-xl border border-accent/[0.2] bg-gradient-to-br from-accent/[0.1] to-transparent p-3.5">
