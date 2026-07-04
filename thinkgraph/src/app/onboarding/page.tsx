@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo, IconDatabase, IconCheck, IconSparkle } from "@/components/icons";
 
@@ -34,7 +33,7 @@ const FIELD_ROWS: {
 ];
 
 export default function OnboardingPage() {
-  const router = useRouter();
+
   const [form, setForm] = useState<FormState>({
     label: "",
     host: "",
@@ -64,7 +63,9 @@ export default function OnboardingPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Connection failed");
       setStatus("success");
-      setTimeout(() => router.push(`/?site=${encodeURIComponent(data.site.key)}`), 1400);
+      // Use full page navigation (not router.push) so the server re-renders
+      // the root layout with the Shell — onboarding is a bare page.
+      setTimeout(() => { window.location.href = `/?site=${encodeURIComponent(data.site.key)}`; }, 1400);
     } catch (err: unknown) {
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "Unknown error");
