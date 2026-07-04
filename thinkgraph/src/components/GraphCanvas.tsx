@@ -93,10 +93,13 @@ export default function GraphCanvas({
   };
   const onPointerMove = (e: React.PointerEvent) => {
     if (!drag.current) return;
+    // Capture values immediately — drag.current may be null by the time
+    // React flushes the setView updater (e.g. if onPointerUp fires first).
+    const { tx: baseTx, ty: baseTy, x: startX, y: startY } = drag.current;
     setView((v) => ({
       ...v,
-      tx: drag.current!.tx + (e.clientX - drag.current!.x),
-      ty: drag.current!.ty + (e.clientY - drag.current!.y),
+      tx: baseTx + (e.clientX - startX),
+      ty: baseTy + (e.clientY - startY),
     }));
   };
   const onPointerUp = () => {
