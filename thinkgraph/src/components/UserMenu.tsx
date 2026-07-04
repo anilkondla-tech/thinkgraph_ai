@@ -112,7 +112,7 @@ export default function UserMenu() {
               Connect WordPress site
             </Link>
             <Link
-              href="#upgrade"
+              href="/upgrade"
               role="menuitem"
               onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs text-accent-soft transition hover:bg-accent/[0.08] hover:text-white"

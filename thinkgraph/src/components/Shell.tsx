@@ -13,6 +13,7 @@ const NAV = [
   { href: "/clusters", label: "Clusters & Gaps", icon: IconLayers },
   { href: "/plan", label: "Action Plan", icon: IconBolt },
   { href: "/workspaces", label: "Workspaces", icon: IconDatabase },
+  { href: "/upgrade", label: "Upgrade", icon: IconSparkle },
 ];
 
 export default function Shell({
