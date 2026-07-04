@@ -1,4 +1,5 @@
 import { getSiteAnalytics } from "@/lib/data";
+import { getUserSiteConnections } from "@/lib/userSites";
 import GraphCanvas from "@/components/GraphCanvas";
 import { PageHeader, SourceBadge, Stat, EmptyHint } from "@/components/ui";
 
@@ -10,7 +11,8 @@ export default async function GraphPage({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const site = typeof searchParams.site === "string" ? searchParams.site : undefined;
-  const a = await getSiteAnalytics(site);
+  const userSites = getUserSiteConnections();
+  const a = await getSiteAnalytics(site, { userSites });
 
   return (
     <div>

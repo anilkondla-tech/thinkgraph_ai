@@ -24,16 +24,18 @@ function metaFor(siteKey: string, userSites: SiteConnection[] = []): SiteMeta {
   return { key: c.key, label: c.label, url: c.url };
 }
 
-/** Returns all sites: env-configured + user-added. */
+/**
+ * Returns the sites to show in the UI.
+ * When the user has their own connected sites, show only those.
+ * Fall back to env-configured sites (dev/admin) when no user sites exist.
+ */
 export function listSites(userSites: SiteConnection[] = []): SiteMeta[] {
   if (isDemoMode()) return [DEMO_SITE];
+  if (userSites.length > 0) {
+    return userSites.map((s) => ({ key: s.key, label: s.label, url: s.url }));
+  }
   const envSites = getAvailableSites();
-  const userMeta = userSites.map((s) => ({ key: s.key, label: s.label, url: s.url }));
-  const all = [
-    ...envSites,
-    ...userMeta.filter((u) => !envSites.some((e) => e.key === u.key)),
-  ];
-  return all.length ? all : [DEMO_SITE];
+  return envSites.length ? envSites : [DEMO_SITE];
 }
 
 export function resolveSiteKey(
@@ -41,10 +43,15 @@ export function resolveSiteKey(
   userSites: SiteConnection[] = []
 ): string {
   if (isDemoMode()) return "demo";
+  // When user has their own sites, only resolve among those
+  if (userSites.length > 0) {
+    const userKeys = userSites.map((s) => s.key);
+    if (requested && userKeys.includes(requested)) return requested;
+    return userKeys[0];
+  }
+  // Fall back to env-configured sites
   const envKeys = getAvailableSites().map((s) => s.key);
-  const userKeys = userSites.map((s) => s.key);
-  const allKeys = [...envKeys, ...userKeys];
-  if (requested && allKeys.includes(requested)) return requested;
+  if (requested && envKeys.includes(requested)) return requested;
   return getDefaultSiteKey();
 }
 

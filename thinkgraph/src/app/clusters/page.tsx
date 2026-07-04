@@ -1,4 +1,5 @@
 import { getSiteAnalytics } from "@/lib/data";
+import { getUserSiteConnections } from "@/lib/userSites";
 import { PageHeader, SourceBadge, HealthPill, EmptyHint } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +23,8 @@ export default async function ClustersPage({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const site = typeof searchParams.site === "string" ? searchParams.site : undefined;
-  const a = await getSiteAnalytics(site);
+  const userSites = getUserSiteConnections();
+  const a = await getSiteAnalytics(site, { userSites });
   const thin = a.clusters.filter((c) => c.health === "thin").length;
 
   return (

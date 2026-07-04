@@ -1,4 +1,5 @@
 import { getSiteAnalytics } from "@/lib/data";
+import { getUserSiteConnections } from "@/lib/userSites";
 import ActionList from "@/components/ActionList";
 import { PageHeader, SourceBadge } from "@/components/ui";
 
@@ -11,8 +12,9 @@ export default async function PlanPage({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const site = typeof searchParams.site === "string" ? searchParams.site : undefined;
+  const userSites = getUserSiteConnections();
   // Try AI on first load so the plan is richest; falls back gracefully.
-  const a = await getSiteAnalytics(site, { withAi: true });
+  const a = await getSiteAnalytics(site, { withAi: true, userSites });
 
   return (
     <div>
