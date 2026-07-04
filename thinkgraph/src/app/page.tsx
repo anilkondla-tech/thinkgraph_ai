@@ -80,7 +80,7 @@ export default async function OverviewPage({
         </div>
       </div>
 
-      {/* Charts */}}
+      {/* Charts */}
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="card card-pad lg:col-span-2">
           <div className="mb-3 flex items-center justify-between">
