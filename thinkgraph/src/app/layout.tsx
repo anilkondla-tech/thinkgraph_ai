@@ -21,8 +21,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-  // Unauthenticated visitors only see the demo site.
-  // Authenticated users see their connected site(s).
+  // listSites always includes Demo + the user's own connected sites.
+  // For unauthenticated visitors we short-circuit to [DEMO_SITE].
   const userSites = session ? await getUserSiteConnections() : [];
   const sites = session ? listSites(userSites) : [DEMO_SITE];
   return (

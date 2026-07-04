@@ -25,17 +25,14 @@ function metaFor(siteKey: string, userSites: SiteConnection[] = []): SiteMeta {
 }
 
 /**
- * Returns the sites to show in the UI.
- * When the user has their own connected sites, show only those.
- * Fall back to env-configured sites (dev/admin) when no user sites exist.
+ * Returns the sites to show in the dropdown for an authenticated user:
+ * always the Demo workspace, followed by any sites the user has connected.
+ * Env-configured sites are intentionally excluded from the UI.
  */
 export function listSites(userSites: SiteConnection[] = []): SiteMeta[] {
   if (isDemoMode()) return [DEMO_SITE];
-  if (userSites.length > 0) {
-    return userSites.map((s) => ({ key: s.key, label: s.label, url: s.url }));
-  }
-  const envSites = getAvailableSites();
-  return envSites.length ? envSites : [DEMO_SITE];
+  const userMeta = userSites.map((s) => ({ key: s.key, label: s.label, url: s.url }));
+  return [DEMO_SITE, ...userMeta];
 }
 
 export function resolveSiteKey(
@@ -43,16 +40,13 @@ export function resolveSiteKey(
   userSites: SiteConnection[] = []
 ): string {
   if (isDemoMode()) return "demo";
-  // When user has their own sites, only resolve among those
-  if (userSites.length > 0) {
-    const userKeys = userSites.map((s) => s.key);
-    if (requested && userKeys.includes(requested)) return requested;
-    return userKeys[0];
-  }
-  // Fall back to env-configured sites
-  const envKeys = getAvailableSites().map((s) => s.key);
-  if (requested && envKeys.includes(requested)) return requested;
-  return getDefaultSiteKey();
+  // Demo is always resolvable
+  if (requested === "demo") return "demo";
+  // Resolve within the user's own connected sites
+  const userKeys = userSites.map((s) => s.key);
+  if (requested && userKeys.includes(requested)) return requested;
+  // Default: first user site if any, otherwise demo
+  return userKeys[0] ?? "demo";
 }
 
 export async function getSiteAnalytics(
