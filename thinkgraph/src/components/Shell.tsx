@@ -57,12 +57,12 @@ export default function Shell({
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-white/[0.06] bg-ink-900/60 px-4 py-5 backdrop-blur-md md:flex">
-        <Link href={withSite("/")} className="mb-8 flex items-center gap-2.5 px-2">
+      <aside className="sticky top-0 hidden h-screen w-[260px] shrink-0 flex-col border-r border-surface-border bg-ink-900/80 px-4 py-6 backdrop-blur-xl md:flex">
+        <Link href={withSite("/")} className="mb-9 flex items-center gap-2.5 px-2">
           <Logo className="h-8 w-8" />
           <div className="leading-tight">
             <div className="text-[15px] font-semibold text-white">ThinkGraph</div>
-            <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-accent-soft">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent-soft font-mono">
               AI
             </div>
           </div>
@@ -86,51 +86,49 @@ export default function Shell({
 
         <div className="mt-auto space-y-3">
           {!isAuthenticated ? (
-            /* Demo mode — identical card structure to authenticated */
-            <div className="rounded-xl border border-accent/[0.2] bg-gradient-to-br from-accent/[0.1] to-transparent p-3.5">
-              <div className="mb-1 flex items-center gap-1.5">
+            <div className="rounded-2xl border border-accent/[0.15] bg-gradient-to-br from-accent/[0.06] to-transparent p-4 backdrop-blur-sm">
+              <div className="mb-1.5 flex items-center gap-1.5">
                 <IconSparkle className="h-3.5 w-3.5 text-accent-soft" />
                 <span className="text-[11px] font-semibold text-white">Workspace</span>
               </div>
-              <p className="text-[10px] leading-relaxed text-slate-500 mb-2">
-                Demo workspace · sign in to connect your own site.
+              <p className="text-[10px] leading-relaxed text-slate-500 mb-3">
+                Demo workspace · sign in to connect your site.
               </p>
               <a
                 href="/login"
-                className="block rounded-lg bg-accent/[0.15] py-1.5 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.25]"
+                className="block rounded-xl bg-accent/[0.12] py-2 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.2] border border-accent/[0.15]"
               >
                 Sign in →
               </a>
             </div>
           ) : (
-            /* Authenticated: workspace list + connect CTA */
-            <div className="rounded-xl border border-accent/[0.2] bg-gradient-to-br from-accent/[0.1] to-transparent p-3.5">
-              <div className="mb-1 flex items-center gap-1.5">
+            <div className="rounded-2xl border border-accent/[0.15] bg-gradient-to-br from-accent/[0.06] to-transparent p-4 backdrop-blur-sm">
+              <div className="mb-1.5 flex items-center gap-1.5">
                 <IconSparkle className="h-3.5 w-3.5 text-accent-soft" />
                 <span className="text-[11px] font-semibold text-white">Workspaces</span>
               </div>
-              <p className="text-[10px] leading-relaxed text-slate-500 mb-2">
+              <p className="text-[10px] leading-relaxed text-slate-500 mb-3">
                 {sites.length === 1 && sites[0].key === "demo"
                   ? "No sites connected yet."
                   : `${sites.length} site${sites.length === 1 ? "" : "s"} connected.`}
               </p>
               <Link
                 href="/onboarding"
-                className="block rounded-lg bg-accent/[0.15] py-1.5 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.25]"
+                className="block rounded-xl bg-accent/[0.12] py-2 text-center text-[11px] font-semibold text-accent-soft transition hover:bg-accent/[0.2] border border-accent/[0.15]"
               >
                 + Connect WordPress site
               </Link>
             </div>
           )}
           <p className="px-2 text-[10px] leading-relaxed text-slate-600">
-            ThinkGraph AI · MVP. Insights are advisory — validate before publishing.
+            ThinkGraph AI · MVP
           </p>
         </div>
       </aside>
 
       {/* Main */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-white/[0.06] bg-ink-950/70 px-5 py-3 backdrop-blur-md md:px-8">
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-surface-border bg-ink-950/80 px-5 py-3 backdrop-blur-xl md:px-8">
           <div className="flex items-center gap-2 md:hidden">
             <Logo className="h-7 w-7" />
             <span className="font-semibold text-white">ThinkGraph</span>
@@ -143,8 +141,8 @@ export default function Shell({
                 onClick={() => isAuthenticated && setSitePickerOpen((v) => !v)}
                 aria-haspopup={isAuthenticated ? "listbox" : undefined}
                 aria-expanded={isAuthenticated ? sitePickerOpen : undefined}
-                className={`flex min-w-[180px] max-w-[240px] items-center gap-2.5 rounded-xl border border-white/[0.08] bg-ink-800 py-2 pl-3.5 pr-3 text-sm font-medium text-slate-100 transition ${
-                  isAuthenticated ? "hover:border-white/20 cursor-pointer" : "cursor-default"
+                className={`flex min-w-[180px] max-w-[240px] items-center gap-2.5 rounded-xl border border-surface-border bg-ink-800/80 py-2 pl-3.5 pr-3 text-sm font-medium text-slate-200 backdrop-blur-sm transition ${
+                  isAuthenticated ? "hover:border-accent/30 cursor-pointer" : "cursor-default"
                 }`}
               >
                 <IconDatabase className="h-4 w-4 shrink-0 text-slate-500" />
@@ -153,7 +151,7 @@ export default function Shell({
                 </span>
                 {isAuthenticated && (
                   <IconChevron
-                    className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${
+                    className={`h-4 w-4 shrink-0 text-slate-500 transition-transform duration-200 ${
                       sitePickerOpen ? "rotate-180" : ""
                     }`}
                   />
@@ -164,7 +162,7 @@ export default function Shell({
                 <div
                   role="listbox"
                   aria-label="Select workspace"
-                  className="absolute right-0 top-full z-50 mt-2 min-w-full w-max overflow-hidden rounded-2xl border border-white/[0.08] bg-ink-800 shadow-card"
+                  className="absolute right-0 top-full z-50 mt-2 min-w-full w-max overflow-hidden rounded-2xl border border-surface-border bg-ink-800/95 shadow-elevated backdrop-blur-xl animate-fade-in"
                 >
                   {sites.map((s) => (
                     <button
@@ -175,10 +173,10 @@ export default function Shell({
                         onSiteChange(s.key);
                         setSitePickerOpen(false);
                       }}
-                      className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-white/[0.04] ${
+                      className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-sm transition ${
                         s.key === currentSite
-                          ? "bg-accent/[0.08] text-white"
-                          : "text-slate-400 hover:text-slate-100"
+                          ? "bg-accent-muted text-white"
+                          : "text-slate-400 hover:bg-surface-hover hover:text-slate-100"
                       }`}
                     >
                       <span className="flex h-4 w-4 shrink-0 items-center justify-center">
@@ -189,11 +187,11 @@ export default function Shell({
                       <span className="truncate">{s.label}</span>
                     </button>
                   ))}
-                  <div className="border-t border-white/[0.06] p-1.5">
+                  <div className="border-t border-surface-border p-1.5">
                     <Link
                       href="/workspaces"
                       onClick={() => setSitePickerOpen(false)}
-                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs text-slate-500 transition hover:bg-white/[0.04] hover:text-slate-300"
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs text-slate-500 transition hover:bg-surface-hover hover:text-slate-300"
                     >
                       <IconDatabase className="h-3.5 w-3.5 shrink-0" />
                       Manage workspaces
@@ -204,14 +202,14 @@ export default function Shell({
             </div>
             <button
               onClick={() => startTransition(() => router.refresh())}
-              className="rounded-xl border border-white/[0.08] bg-ink-800 px-3.5 py-2 text-sm font-medium text-slate-300 transition hover:border-white/20 hover:text-white"
+              className="rounded-xl border border-surface-border bg-ink-800/80 px-3.5 py-2 text-sm font-medium text-slate-300 backdrop-blur-sm transition hover:border-accent/30 hover:text-white"
             >
               {pending ? "…" : "Refresh"}
             </button>
             {!isAuthenticated ? (
               <a
                 href="/login"
-                className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white shadow-glow transition hover:bg-accent-glow"
+                className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white shadow-glow transition hover:bg-accent-glow hover:shadow-glow-sm"
               >
                 Sign in
               </a>
@@ -230,8 +228,8 @@ export default function Shell({
                 <Link
                   key={href}
                   href={withSite(href)}
-                  className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-sm ${
-                    active ? "bg-accent/20 text-white" : "bg-ink-800 text-slate-400"
+                  className={`whitespace-nowrap rounded-xl px-3 py-1.5 text-sm font-medium transition ${
+                    active ? "bg-accent-muted text-white shadow-glow-sm" : "bg-ink-800 text-slate-400 border border-surface-border"
                   }`}
                 >
                   {label}

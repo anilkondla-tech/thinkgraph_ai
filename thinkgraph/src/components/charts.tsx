@@ -1,16 +1,16 @@
 // Lightweight, dependency-free SVG charts — server-renderable.
 
 const PALETTE = [
-  "#7c6cff",
-  "#3ad6c5",
-  "#ffb454",
-  "#ff6b8b",
-  "#5b9bff",
-  "#b07cff",
-  "#4fd17a",
-  "#ff9f6b",
-  "#6be0ff",
-  "#e06bd1",
+  "#5E6AD2",
+  "#3EDBC2",
+  "#F5A623",
+  "#F25F7B",
+  "#4E9AF1",
+  "#A67CFF",
+  "#4FD17A",
+  "#FF8F5E",
+  "#6BE0FF",
+  "#D06BD1",
 ];
 
 export function BarList({
@@ -22,22 +22,23 @@ export function BarList({
 }) {
   const max = Math.max(1, ...data.map((d) => d.value));
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-3">
       {data.map((d, i) => (
         <div key={d.label} className="group">
-          <div className="mb-1 flex items-baseline justify-between gap-3">
-            <span className="truncate text-sm text-slate-300">{d.label}</span>
-            <span className="shrink-0 text-xs tabular-nums text-slate-500">
+          <div className="mb-1.5 flex items-baseline justify-between gap-3">
+            <span className="truncate text-sm text-slate-300 group-hover:text-white transition-colors">{d.label}</span>
+            <span className="shrink-0 text-xs tabular-nums text-slate-500 font-mono">
               {d.value.toLocaleString()}
               {valueLabel ? ` ${valueLabel}` : ""}
             </span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-white/[0.05]">
+          <div className="h-1.5 overflow-hidden rounded-full bg-surface">
             <div
-              className="h-full rounded-full transition-all"
+              className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${(d.value / max) * 100}%`,
-                background: `linear-gradient(90deg, ${PALETTE[i % PALETTE.length]}, ${PALETTE[i % PALETTE.length]}aa)`,
+                background: `linear-gradient(90deg, ${PALETTE[i % PALETTE.length]}, ${PALETTE[i % PALETTE.length]}88)`,
+                boxShadow: `0 0 12px -4px ${PALETTE[i % PALETTE.length]}66`,
               }}
             />
           </div>
@@ -70,21 +71,25 @@ export function WeeklyTrend({
     <svg viewBox={`0 0 ${w} ${h}`} className="w-full" preserveAspectRatio="none">
       <defs>
         <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#7c6cff" stopOpacity="0.4" />
-          <stop offset="1" stopColor="#7c6cff" stopOpacity="0" />
+          <stop offset="0" stopColor="#5E6AD2" stopOpacity="0.25" />
+          <stop offset="1" stopColor="#5E6AD2" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="trendStroke" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#5E6AD2" />
+          <stop offset="1" stopColor="#3EDBC2" />
         </linearGradient>
       </defs>
       <polygon points={area} fill="url(#trendFill)" />
       <polyline
         points={line}
         fill="none"
-        stroke="#a99bff"
+        stroke="url(#trendStroke)"
         strokeWidth="2"
         strokeLinejoin="round"
         strokeLinecap="round"
       />
       {data.map((d, i) => (
-        <circle key={d.week} cx={x(i)} cy={y(d.count)} r="1.6" fill="#cfc7ff" />
+        <circle key={d.week} cx={x(i)} cy={y(d.count)} r="1.5" fill="#8B94E8" />
       ))}
     </svg>
   );
@@ -97,41 +102,44 @@ export function Donut({
 }) {
   const total = data.reduce((a, d) => a + d.value, 0) || 1;
   let acc = 0;
-  const r = 56;
+  const r = 52;
   const c = 2 * Math.PI * r;
   return (
     <div className="flex items-center gap-5">
-      <svg width="140" height="140" viewBox="0 0 140 140" className="-rotate-90 shrink-0">
-        <circle cx="70" cy="70" r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="16" />
+      <svg width="130" height="130" viewBox="0 0 130 130" className="-rotate-90 shrink-0">
+        <circle cx="65" cy="65" r={r} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="14" />
         {data.map((d, i) => {
           const frac = d.value / total;
           const dash = frac * c;
+          const gap = 2; // Small gap between segments
           const seg = (
             <circle
               key={d.label}
-              cx="70"
-              cy="70"
+              cx="65"
+              cy="65"
               r={r}
               fill="none"
               stroke={PALETTE[i % PALETTE.length]}
-              strokeWidth="16"
-              strokeDasharray={`${dash} ${c}`}
+              strokeWidth="14"
+              strokeLinecap="round"
+              strokeDasharray={`${Math.max(0, dash - gap)} ${c - dash + gap}`}
               strokeDashoffset={-acc * c}
+              style={{ filter: `drop-shadow(0 0 4px ${PALETTE[i % PALETTE.length]}44)` }}
             />
           );
           acc += frac;
           return seg;
         })}
       </svg>
-      <ul className="space-y-1.5 text-sm">
+      <ul className="space-y-2 text-sm">
         {data.map((d, i) => (
-          <li key={d.label} className="flex items-center gap-2">
+          <li key={d.label} className="flex items-center gap-2.5">
             <span
               className="h-2.5 w-2.5 rounded-sm"
-              style={{ background: PALETTE[i % PALETTE.length] }}
+              style={{ background: PALETTE[i % PALETTE.length], boxShadow: `0 0 6px ${PALETTE[i % PALETTE.length]}44` }}
             />
             <span className="text-slate-300">{d.label}</span>
-            <span className="text-slate-500">{d.value.toLocaleString()}</span>
+            <span className="text-slate-600 font-mono text-xs">{d.value.toLocaleString()}</span>
           </li>
         ))}
       </ul>

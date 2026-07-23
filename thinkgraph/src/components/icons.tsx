@@ -16,7 +16,7 @@ export function Logo({ className }: { className?: string }) {
     <svg className={className} viewBox="0 0 32 32" fill="none">
       <defs>
         <linearGradient id="tg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#a99bff" />
+          <stop offset="0" stopColor="#8B94E8" />
           <stop offset="1" stopColor="#5b4bd6" />
         </linearGradient>
       </defs>

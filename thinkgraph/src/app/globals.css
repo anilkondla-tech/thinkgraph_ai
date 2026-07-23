@@ -5,7 +5,9 @@
 :root {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --radius: 16px;
 }
 
 @layer base {
@@ -15,57 +17,107 @@
   body {
     @apply bg-ink-950 text-slate-200 antialiased;
     font-family: var(--font-sans);
-    background-image: radial-gradient(
-        1100px 600px at 78% -8%,
-        rgba(124, 108, 255, 0.14),
+    background-image:
+      radial-gradient(
+        ellipse 1200px 700px at 75% -5%,
+        rgba(94, 106, 210, 0.08),
         transparent 60%
       ),
       radial-gradient(
-        900px 500px at -5% 12%,
-        rgba(58, 214, 197, 0.08),
-        transparent 55%
+        ellipse 800px 500px at -5% 15%,
+        rgba(62, 219, 194, 0.04),
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse 600px 400px at 50% 80%,
+        rgba(94, 106, 210, 0.03),
+        transparent 50%
       );
     background-attachment: fixed;
   }
   ::selection {
-    background: rgba(124, 108, 255, 0.35);
+    background: rgba(94, 106, 210, 0.35);
   }
-  /* thin scrollbars */
+  /* Thin scrollbars — subtle glass feel */
   *::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
   }
   *::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
     border-radius: 999px;
     border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.12);
     background-clip: content-box;
   }
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-white/[0.06] bg-ink-850/70 shadow-card backdrop-blur-sm;
+    @apply rounded-2xl border border-surface-border bg-ink-850/60 shadow-card backdrop-blur-md;
+    transition: box-shadow 0.3s var(--easing), border-color 0.3s var(--easing);
+  }
+  .card:hover {
+    @apply shadow-card-hover border-accent/[0.15];
   }
   .card-pad {
     @apply p-5;
   }
+  .card-compact {
+    @apply p-4;
+  }
   .pill {
-    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide;
   }
   .nav-link {
-    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:bg-white/[0.04] hover:text-slate-100;
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 transition-all duration-200;
+  }
+  .nav-link:hover {
+    @apply bg-surface-hover text-slate-200;
   }
   .nav-link-active {
-    @apply bg-accent/[0.14] text-white;
+    @apply bg-accent-muted text-white shadow-glow-sm;
   }
   .label-muted {
     @apply text-[11px] font-semibold uppercase tracking-wider text-slate-500;
+    font-family: var(--font-mono);
   }
   .text-gradient {
-    background: linear-gradient(135deg, #a99bff 0%, #3ad6c5 100%);
+    background: linear-gradient(135deg, #8B94E8 0%, #3EDBC2 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+  .section-header {
+    @apply flex items-center gap-3 mb-5;
+  }
+  .section-header h2 {
+    @apply text-base font-semibold text-white;
+  }
+  .section-header::after {
+    content: "";
+    @apply flex-1 h-px bg-gradient-to-r from-surface-border to-transparent;
+  }
+  .data-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .stagger > * {
+    @apply animate-fade-up;
+  }
+  .stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger > *:nth-child(2) { animation-delay: 50ms; }
+  .stagger > *:nth-child(3) { animation-delay: 100ms; }
+  .stagger > *:nth-child(4) { animation-delay: 150ms; }
+  .stagger > *:nth-child(5) { animation-delay: 200ms; }
+  .stagger > *:nth-child(6) { animation-delay: 250ms; }
+  .stagger > *:nth-child(7) { animation-delay: 300ms; }
+  .stagger > *:nth-child(8) { animation-delay: 350ms; }
 }

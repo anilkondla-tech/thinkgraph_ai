@@ -163,7 +163,7 @@ export default function GraphCanvas({
                     y1={s.y}
                     x2={t.x}
                     y2={t.y}
-                    stroke={hot ? "#a99bff" : "rgba(255,255,255,0.06)"}
+                    stroke={hot ? "#8B94E8" : "rgba(255,255,255,0.06)"}
                     strokeWidth={hot ? 1.4 : 0.7}
                   />
                 );
@@ -176,7 +176,7 @@ export default function GraphCanvas({
                 if (!p) return null;
                 const r = 3 + Math.min(9, n.inDegree * 1.3);
                 const dim = isDim(n);
-                const color = n.orphan ? "#ff6b8b" : colorOf.get(n.category) ?? "#7c6cff";
+                const color = n.orphan ? "#F25F7B" : colorOf.get(n.category) ?? "#5E6AD2";
                 return (
                   <circle
                     key={n.id}

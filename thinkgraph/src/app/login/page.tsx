@@ -14,16 +14,16 @@ import {
 // ─── Animated knowledge-graph SVG ──────────────────────────────────────────
 
 const NODES = [
-  { id: "a", cx: 48,  cy: 80,  r: 10, color: "#7c6cff", glow: true  },
-  { id: "b", cx: 200, cy: 42,  r: 7,  color: "#a99bff", glow: false },
-  { id: "c", cx: 130, cy: 152, r: 13, color: "#3ad6c5", glow: true  },
-  { id: "d", cx: 22,  cy: 218, r: 5,  color: "#a99bff", glow: false },
-  { id: "e", cx: 220, cy: 172, r: 8,  color: "#7c6cff", glow: false },
-  { id: "f", cx: 78,  cy: 246, r: 6,  color: "#3ad6c5", glow: false },
-  { id: "g", cx: 192, cy: 244, r: 11, color: "#ffb454", glow: true  },
-  { id: "h", cx: 120, cy: 52,  r: 5,  color: "#a99bff", glow: false },
-  { id: "i", cx: 248, cy: 90,  r: 5,  color: "#7c6cff", glow: false },
-  { id: "j", cx: 58,  cy: 168, r: 4,  color: "#3ad6c5", glow: false },
+  { id: "a", cx: 48,  cy: 80,  r: 10, color: "#5E6AD2", glow: true  },
+  { id: "b", cx: 200, cy: 42,  r: 7,  color: "#8B94E8", glow: false },
+  { id: "c", cx: 130, cy: 152, r: 13, color: "#3EDBC2", glow: true  },
+  { id: "d", cx: 22,  cy: 218, r: 5,  color: "#8B94E8", glow: false },
+  { id: "e", cx: 220, cy: 172, r: 8,  color: "#5E6AD2", glow: false },
+  { id: "f", cx: 78,  cy: 246, r: 6,  color: "#3EDBC2", glow: false },
+  { id: "g", cx: 192, cy: 244, r: 11, color: "#F5A623", glow: true  },
+  { id: "h", cx: 120, cy: 52,  r: 5,  color: "#8B94E8", glow: false },
+  { id: "i", cx: 248, cy: 90,  r: 5,  color: "#5E6AD2", glow: false },
+  { id: "j", cx: 58,  cy: 168, r: 4,  color: "#3EDBC2", glow: false },
 ] as const;
 
 const NM = Object.fromEntries(NODES.map((n) => [n.id, n]));
@@ -57,7 +57,7 @@ function LiveGraph() {
           y1={NM[a as keyof typeof NM].cy}
           x2={NM[b as keyof typeof NM].cx}
           y2={NM[b as keyof typeof NM].cy}
-          stroke="rgba(124,108,255,0.22)"
+          stroke="rgba(94,106,210,0.22)"
           strokeWidth="1.2"
         />
       ))}
@@ -123,7 +123,7 @@ export default function LoginPage() {
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
         <div className="absolute -left-48 -top-48 h-[650px] w-[650px] rounded-full bg-accent/[0.12] blur-3xl" />
         <div className="absolute -right-24 top-16 h-[550px] w-[550px] rounded-full bg-teal/[0.06] blur-3xl" />
-        <div className="absolute bottom-0 left-1/2 h-[450px] w-[800px] -translate-x-1/2 rounded-full bg-accent-glow/[0.07] blur-3xl" />
+        <div className="absolute bottom-0 left-1/2 h-[450px] w-[800px] -translate-x-1/2 rounded-full bg-accent/[0.05] blur-3xl" />
         {/* Subtle grid */}
         <div
           className="absolute inset-0 opacity-[0.025]"

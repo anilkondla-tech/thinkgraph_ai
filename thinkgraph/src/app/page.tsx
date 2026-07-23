@@ -56,13 +56,13 @@ export default async function OverviewPage({
         <div className="card card-pad flex items-center gap-5 lg:col-span-1">
           <ScoreRing score={a.healthScore} />
           <div>
-            <div className="label-muted">Graph health</div>
-            <p className="mt-1 text-sm text-slate-400">
-              Weighted by orphans, keyword coverage, and internal-link density.
+            <div className="label-muted">Graph Health</div>
+            <p className="mt-1.5 text-[12px] leading-relaxed text-slate-500">
+              Weighted by orphans, keyword coverage, and link density.
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 lg:col-span-3 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 lg:col-span-3 lg:grid-cols-3 stagger">
           <Stat label="Published posts" value={t.publishedPosts} />
           <Stat
             label="Internal links"
@@ -81,7 +81,7 @@ export default async function OverviewPage({
       </div>
 
       {/* Charts */}
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="card card-pad lg:col-span-2">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-white">Publishing cadence</h3>
@@ -90,7 +90,7 @@ export default async function OverviewPage({
           <WeeklyTrend data={a.postsByWeek} />
         </div>
         <div className="card card-pad">
-          <h3 className="mb-3 text-sm font-semibold text-white">Posts by status (excl. published)</h3>
+          <h3 className="mb-3 text-sm font-semibold text-white">Posts by status</h3>
           <Donut
             data={a.statusBreakdown
               .filter((s) => s.status !== "publish")
@@ -100,14 +100,16 @@ export default async function OverviewPage({
       </div>
 
       {/* Content Quality */}
-      <h2 className="mt-8 mb-4 text-lg font-semibold text-white">Content Quality</h2>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="section-header mt-10">
+        <h2>Content Quality</h2>
+      </div>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 stagger">
         <Stat label="Avg word count" value={a.contentQuality.avgWordCount} hint={`Median: ${a.contentQuality.medianWordCount}`} />
         <Stat label="Thin content" value={a.contentQuality.thinContent} hint="< 300 words" tone={a.contentQuality.thinContent > 0 ? "warn" : "good"} />
         <Stat label="Missing featured images" value={a.contentQuality.missingFeaturedImages} tone={a.contentQuality.missingFeaturedImages > 0 ? "warn" : "good"} />
         <Stat label="Missing meta descriptions" value={a.contentQuality.missingMetaDescriptions} tone={a.contentQuality.missingMetaDescriptions > 0 ? "warn" : "good"} />
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4 stagger">
         <Stat label="Avg headings / post" value={a.contentQuality.avgHeadings} />
         <Stat label="Avg images / post" value={a.contentQuality.avgImages} />
         <Stat label="Stale content" value={a.freshness.staleCount} hint="> 12 months since update" tone={a.freshness.staleCount > 0 ? "warn" : "good"} />
@@ -115,15 +117,17 @@ export default async function OverviewPage({
       </div>
 
       {/* Engagement */}
-      <h2 className="mt-8 mb-4 text-lg font-semibold text-white">Engagement</h2>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="section-header mt-10">
+        <h2>Engagement</h2>
+      </div>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 stagger">
         <Stat label="Avg comments / post" value={a.engagement.avgCommentsPerPost} />
         <Stat label="Approved comments" value={a.engagement.commentBreakdown.approved} tone="good" />
         <Stat label="Pending comments" value={a.engagement.commentBreakdown.pending} tone={a.engagement.commentBreakdown.pending > 0 ? "warn" : "default"} />
         <Stat label="Spam comments" value={a.engagement.commentBreakdown.spam} tone={a.engagement.commentBreakdown.spam > 10 ? "bad" : "default"} />
       </div>
       {a.engagement.topCommentedPosts.length > 0 && (
-        <div className="mt-4 card card-pad">
+        <div className="mt-3 card card-pad">
           <h3 className="mb-4 text-sm font-semibold text-white">Most commented posts</h3>
           <BarList
             data={a.engagement.topCommentedPosts.map((p) => ({ label: p.label, value: p.count }))}
@@ -133,8 +137,10 @@ export default async function OverviewPage({
       )}
 
       {/* Link Insights */}
-      <h2 className="mt-8 mb-4 text-lg font-semibold text-white">Link Insights</h2>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="section-header mt-10">
+        <h2>Link Insights</h2>
+      </div>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 stagger">
         <Stat label="Dead-end posts" value={a.linkInsights.deadEnds} hint="No outbound links" tone={a.linkInsights.deadEnds > 0 ? "warn" : "good"} />
         <Stat label="Cross-cluster links" value={a.linkInsights.crossClusterLinks} hint="Topical bridges" />
         <Stat label="Bi-directional links" value={a.linkInsights.biDirectionalLinks} hint="A↔B pairs" />
@@ -142,7 +148,7 @@ export default async function OverviewPage({
       </div>
 
       {/* Author & Tag Analytics */}
-      <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="card card-pad">
           <h3 className="mb-4 text-sm font-semibold text-white">Author contributions</h3>
           <BarList
@@ -155,20 +161,20 @@ export default async function OverviewPage({
           <div className="grid grid-cols-3 gap-4">
             <div>
               <div className="label-muted">Unique tags</div>
-              <div className="mt-2 text-2xl font-semibold text-white">{a.tagCoverage.totalTags}</div>
+              <div className="mt-2 text-2xl font-semibold text-white data-value">{a.tagCoverage.totalTags}</div>
             </div>
             <div>
               <div className="label-muted">Untagged posts</div>
-              <div className={`mt-2 text-2xl font-semibold ${a.tagCoverage.postsWithoutTags > 0 ? "text-amber" : "text-white"}`}>
+              <div className={`mt-2 text-2xl font-semibold data-value ${a.tagCoverage.postsWithoutTags > 0 ? "text-amber" : "text-white"}`}>
                 {a.tagCoverage.postsWithoutTags}
               </div>
             </div>
             <div>
               <div className="label-muted">Over-tagged</div>
-              <div className={`mt-2 text-2xl font-semibold ${a.tagCoverage.overTaggedPosts > 0 ? "text-rose" : "text-white"}`}>
+              <div className={`mt-2 text-2xl font-semibold data-value ${a.tagCoverage.overTaggedPosts > 0 ? "text-rose" : "text-white"}`}>
                 {a.tagCoverage.overTaggedPosts}
               </div>
-              <div className="mt-1 text-xs text-slate-500">&gt; 10 tags</div>
+              <div className="mt-1 text-[11px] text-slate-600 font-mono">&gt; 10 tags</div>
             </div>
           </div>
         </div>
@@ -185,30 +191,30 @@ export default async function OverviewPage({
         <div className="card card-pad flex flex-col">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-white">Top recommendations</h3>
-            <Link href={`/plan?site=${a.site.key}`} className="text-xs text-accent-soft hover:text-white">
+            <Link href={`/plan?site=${a.site.key}`} className="text-xs font-medium text-accent-soft hover:text-white transition">
               View all →
             </Link>
           </div>
-          <ul className="flex-1 space-y-2.5">
+          <ul className="flex-1 space-y-3">
             {a.actions.slice(0, 4).map((x) => (
               <li key={x.id} className="flex items-start gap-2.5">
                 <span
-                  className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${
-                    x.impact === "high" ? "bg-rose" : x.impact === "medium" ? "bg-amber" : "bg-slate-500"
+                  className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
+                    x.impact === "high" ? "bg-rose shadow-[0_0_6px_rgba(242,95,123,0.4)]" : x.impact === "medium" ? "bg-amber shadow-[0_0_6px_rgba(245,166,35,0.3)]" : "bg-slate-600"
                   }`}
                 />
                 <span className="text-sm text-slate-300">{x.title}</span>
               </li>
             ))}
             {a.actions.length === 0 && (
-              <li className="text-sm text-slate-500">No issues detected — nice.</li>
+              <li className="text-sm text-slate-600">No issues detected — nice.</li>
             )}
           </ul>
         </div>
       </div>
 
       {/* Articles by Cluster */}
-      <div className="mt-4">
+      <div className="mt-6">
         <ArticlesByCluster groups={clusterGroups} siteUrl={a.site.url} />
       </div>
     </div>
