@@ -17,7 +17,7 @@ export function Logo({ className }: { className?: string }) {
     <img
       src="/logo.png"
       alt="ThinkGraph AI"
-      className={className}
+      className={`${className ?? ""} animate-spin-slow`}
     />
   );
 }

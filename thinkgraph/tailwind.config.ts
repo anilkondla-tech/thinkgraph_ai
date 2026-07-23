@@ -72,6 +72,10 @@ const config: Config = {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        "spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both",
@@ -79,6 +83,7 @@ const config: Config = {
         pulseglow: "pulseglow 2.4s ease-in-out infinite",
         float: "float 5s ease-in-out infinite",
         shimmer: "shimmer 2s infinite",
+        "spin-slow": "spin-slow 12s linear infinite",
       },
     },
   },
