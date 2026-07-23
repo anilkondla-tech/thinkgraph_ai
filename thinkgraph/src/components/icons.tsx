@@ -13,72 +13,12 @@ const base = {
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 270 280" className={`${className ?? ""} animate-spin-slow`} aria-hidden="true">
-      <defs>
-        <filter id="lg-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="5" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      <line x1="48" y1="80" x2="120" y2="52" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="48" y1="80" x2="130" y2="152" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="48" y1="80" x2="58" y2="168" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="120" y1="52" x2="200" y2="42" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="120" y1="52" x2="130" y2="152" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="200" y1="42" x2="248" y2="90" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="200" y1="42" x2="220" y2="172" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="130" y1="152" x2="58" y2="168" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="130" y1="152" x2="220" y2="172" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="130" y1="152" x2="78" y2="246" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="130" y1="152" x2="192" y2="244" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="220" y1="172" x2="192" y2="244" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="220" y1="172" x2="248" y2="90" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="78" y1="246" x2="192" y2="244" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <line x1="22" y1="218" x2="58" y2="168" stroke="rgba(94,106,210,0.22)" strokeWidth="1.2" />
-      <g filter="url(#lg-glow)">
-        <circle cx="48" cy="80" r="24" fill="#5E6AD2" opacity="0.07" />
-        <circle cx="48" cy="80" r="10" fill="#5E6AD2" opacity="0.88" />
-      </g>
-      <g>
-        <circle cx="200" cy="42" r="16.8" fill="#8B94E8" opacity="0.07" />
-        <circle cx="200" cy="42" r="7" fill="#8B94E8" opacity="0.88" />
-      </g>
-      <g filter="url(#lg-glow)">
-        <circle cx="130" cy="152" r="31.2" fill="#3EDBC2" opacity="0.07" />
-        <circle cx="130" cy="152" r="13" fill="#3EDBC2" opacity="0.88" />
-      </g>
-      <g>
-        <circle cx="22" cy="218" r="12" fill="#8B94E8" opacity="0.07" />
-        <circle cx="22" cy="218" r="5" fill="#8B94E8" opacity="0.88" />
-      </g>
-      <g>
-        <circle cx="220" cy="172" r="19.2" fill="#5E6AD2" opacity="0.07" />
-        <circle cx="220" cy="172" r="8" fill="#5E6AD2" opacity="0.88" />
-      </g>
-      <g>
-        <circle cx="78" cy="246" r="14.4" fill="#3EDBC2" opacity="0.07" />
-        <circle cx="78" cy="246" r="6" fill="#3EDBC2" opacity="0.88" />
-      </g>
-      <g filter="url(#lg-glow)">
-        <circle cx="192" cy="244" r="26.4" fill="#F5A623" opacity="0.07" />
-        <circle cx="192" cy="244" r="11" fill="#F5A623" opacity="0.88" />
-      </g>
-      <g>
-        <circle cx="120" cy="52" r="12" fill="#8B94E8" opacity="0.07" />
-        <circle cx="120" cy="52" r="5" fill="#8B94E8" opacity="0.88" />
-      </g>
-      <g>
-        <circle cx="248" cy="90" r="12" fill="#5E6AD2" opacity="0.07" />
-        <circle cx="248" cy="90" r="5" fill="#5E6AD2" opacity="0.88" />
-      </g>
-      <g>
-        <circle cx="58" cy="168" r="9.6" fill="#3EDBC2" opacity="0.07" />
-        <circle cx="58" cy="168" r="4" fill="#3EDBC2" opacity="0.88" />
-      </g>
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/logo.png"
+      alt="ThinkGraph AI"
+      className={`${className ?? ""} animate-spin-slow`}
+    />
   );
 }
 
