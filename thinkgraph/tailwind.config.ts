@@ -83,7 +83,7 @@ const config: Config = {
         pulseglow: "pulseglow 2.4s ease-in-out infinite",
         float: "float 5s ease-in-out infinite",
         shimmer: "shimmer 2s infinite",
-        "spin-slow": "spin-slow 12s linear infinite",
+        "spin-slow": "spin-slow 20s linear infinite",
       },
     },
   },
