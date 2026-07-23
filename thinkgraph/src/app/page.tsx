@@ -53,7 +53,7 @@ export default async function OverviewPage({
 
       {/* Top row: score + key stats */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
-        <div className="card card-pad flex items-center gap-5 lg:col-span-1">
+        <div className="card card-pad flex flex-col items-center gap-4 sm:flex-row sm:gap-5 lg:col-span-1">
           <ScoreRing score={a.healthScore} />
           <div>
             <div className="label-muted">Graph Health</div>
@@ -62,7 +62,7 @@ export default async function OverviewPage({
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3 lg:col-span-3 lg:grid-cols-3 stagger">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-3 stagger">
           <Stat label="Published posts" value={t.publishedPosts} />
           <Stat
             label="Internal links"
@@ -103,14 +103,13 @@ export default async function OverviewPage({
       <div className="section-header mt-10">
         <h2>Content Quality</h2>
       </div>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 stagger">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger">
         <Stat label="Avg word count" value={a.contentQuality.avgWordCount} hint={`Median: ${a.contentQuality.medianWordCount}`} />
         <Stat label="Thin content" value={a.contentQuality.thinContent} hint="< 300 words" tone={a.contentQuality.thinContent > 0 ? "warn" : "good"} />
         <Stat label="Missing featured images" value={a.contentQuality.missingFeaturedImages} tone={a.contentQuality.missingFeaturedImages > 0 ? "warn" : "good"} />
         <Stat label="Missing meta descriptions" value={a.contentQuality.missingMetaDescriptions} tone={a.contentQuality.missingMetaDescriptions > 0 ? "warn" : "good"} />
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4 stagger">
-        <Stat label="Avg headings / post" value={a.contentQuality.avgHeadings} />
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger">
         <Stat label="Avg images / post" value={a.contentQuality.avgImages} />
         <Stat label="Stale content" value={a.freshness.staleCount} hint="> 12 months since update" tone={a.freshness.staleCount > 0 ? "warn" : "good"} />
         <Stat label="Evergreen ratio" value={`${Math.round(a.freshness.evergreenRatio * 100)}%`} hint="Updated within 6 months" tone={a.freshness.evergreenRatio >= 0.5 ? "good" : "warn"} />
@@ -120,7 +119,7 @@ export default async function OverviewPage({
       <div className="section-header mt-10">
         <h2>Engagement</h2>
       </div>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 stagger">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger">
         <Stat label="Avg comments / post" value={a.engagement.avgCommentsPerPost} />
         <Stat label="Approved comments" value={a.engagement.commentBreakdown.approved} tone="good" />
         <Stat label="Pending comments" value={a.engagement.commentBreakdown.pending} tone={a.engagement.commentBreakdown.pending > 0 ? "warn" : "default"} />
@@ -140,7 +139,7 @@ export default async function OverviewPage({
       <div className="section-header mt-10">
         <h2>Link Insights</h2>
       </div>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 stagger">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger">
         <Stat label="Dead-end posts" value={a.linkInsights.deadEnds} hint="No outbound links" tone={a.linkInsights.deadEnds > 0 ? "warn" : "good"} />
         <Stat label="Cross-cluster links" value={a.linkInsights.crossClusterLinks} hint="Topical bridges" />
         <Stat label="Bi-directional links" value={a.linkInsights.biDirectionalLinks} hint="A↔B pairs" />

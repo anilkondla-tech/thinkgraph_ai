@@ -141,7 +141,7 @@ export default function Shell({
                 onClick={() => isAuthenticated && setSitePickerOpen((v) => !v)}
                 aria-haspopup={isAuthenticated ? "listbox" : undefined}
                 aria-expanded={isAuthenticated ? sitePickerOpen : undefined}
-                className={`flex min-w-[180px] max-w-[240px] items-center gap-2.5 rounded-xl border border-surface-border bg-ink-800/80 py-2 pl-3.5 pr-3 text-sm font-medium text-slate-200 backdrop-blur-sm transition ${
+                className={`flex min-w-[140px] max-w-[200px] sm:min-w-[180px] sm:max-w-[240px] items-center gap-2.5 rounded-xl border border-surface-border bg-ink-800/80 py-2 pl-3.5 pr-3 text-sm font-medium text-slate-200 backdrop-blur-sm transition ${
                   isAuthenticated ? "hover:border-accent/30 cursor-pointer" : "cursor-default"
                 }`}
               >

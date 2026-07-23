@@ -48,7 +48,7 @@ export default async function ClustersPage({
                 <HealthPill health={c.health} />
               </div>
 
-              <div className="grid grid-cols-2 gap-y-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
                 {metric("Posts", c.postCount)}
                 {metric("Internal links", c.internalLinks)}
                 {metric("Link density", c.linkDensity, c.linkDensity < 0.5)}

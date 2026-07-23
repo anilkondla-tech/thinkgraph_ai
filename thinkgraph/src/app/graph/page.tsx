@@ -22,7 +22,7 @@ export default async function GraphPage({
         badge={<SourceBadge source={a.source} />}
       />
 
-      <div className="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Nodes" value={a.graph.nodes.length} />
         <Stat label="Edges" value={a.graph.edges.length} />
         <Stat label="Orphans" value={a.totals.orphans} tone={a.totals.orphans ? "bad" : "good"} />

@@ -239,13 +239,13 @@ export default function LoginPage() {
                 Content Intelligence Platform · 2026
               </span>
 
-              <h1 className="text-5xl font-bold leading-[1.08] tracking-tight text-white lg:text-[3.6rem]">
+              <h1 className="text-3xl font-bold leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-5xl xl:text-[3.6rem]">
                 Stop guessing<br />
                 <span className="text-gradient">what to write</span><br />
                 next.
               </h1>
 
-              <p className="max-w-[480px] text-[1.05rem] leading-relaxed text-slate-400">
+              <p className="max-w-full text-[0.95rem] leading-relaxed text-slate-400 sm:max-w-[480px] sm:text-[1.05rem]">
                 ThinkGraph maps every post, keyword, and internal link into an
                 interactive knowledge graph — then tells you exactly what to
                 write, fix, or link next for SEO and AI-engine visibility.
@@ -335,7 +335,7 @@ export default function LoginPage() {
               Built for solo operators and content teams who want leverage, not more manual audits.
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map(({ icon: Icon, title, desc, accent }, i) => (
               <div
                 key={title}

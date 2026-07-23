@@ -7,8 +7,8 @@ import { IconExternal } from "./icons";
 
 type Pos = { x: number; y: number };
 
-const W = 1000;
-const H = 700;
+const W = 800;
+const H = 550;
 const GOLDEN = Math.PI * (3 - Math.sqrt(5));
 const MAX_EDGES = 1600;
 

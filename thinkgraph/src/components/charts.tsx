@@ -54,7 +54,7 @@ export function WeeklyTrend({
   data: { week: string; count: number }[];
 }) {
   const w = 680;
-  const h = 160;
+  const h = 140;
   const pad = 8;
   if (data.length === 0) {
     return <div className="py-10 text-center text-sm text-slate-600">No publishing data</div>;
@@ -105,8 +105,8 @@ export function Donut({
   const r = 52;
   const c = 2 * Math.PI * r;
   return (
-    <div className="flex items-center gap-5">
-      <svg width="130" height="130" viewBox="0 0 130 130" className="-rotate-90 shrink-0">
+    <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-5">
+      <svg viewBox="0 0 130 130" className="-rotate-90 shrink-0 w-24 h-24 sm:w-[130px] sm:h-[130px]">
         <circle cx="65" cy="65" r={r} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="14" />
         {data.map((d, i) => {
           const frac = d.value / total;

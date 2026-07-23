@@ -15,10 +15,10 @@ export function PageHeader({
     <div className="mb-8 flex flex-wrap items-end justify-between gap-4 animate-fade-up">
       <div>
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight text-white">{title}</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">{title}</h1>
           {badge}
         </div>
-        {subtitle && <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">{subtitle}</p>}
+        {subtitle && <p className="mt-2 max-w-full text-sm leading-relaxed text-slate-400 sm:max-w-2xl">{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
@@ -64,7 +64,7 @@ export function Stat({
   return (
     <div className="card card-compact group animate-fade-up">
       <div className="label-muted">{label}</div>
-      <div className={`mt-2 text-2xl font-semibold tracking-tight data-value ${toneClass}`}>
+      <div className={`mt-2 text-xl font-semibold tracking-tight data-value sm:text-2xl ${toneClass}`}>
         {typeof value === "number" ? value.toLocaleString() : value}
       </div>
       {hint && <div className="mt-1.5 text-[11px] text-slate-600 font-mono">{hint}</div>}
@@ -81,7 +81,7 @@ export function ScoreRing({ score }: { score: number }) {
   const glowColor = score >= 75 ? "rgba(62,219,194,0.3)" : score >= 50 ? "rgba(245,166,35,0.3)" : "rgba(242,95,123,0.3)";
   return (
     <div className="relative grid place-items-center">
-      <svg width="148" height="148" viewBox="0 0 148 148" className="-rotate-90">
+      <svg viewBox="0 0 148 148" className="-rotate-90 w-28 h-28 sm:w-[148px] sm:h-[148px]">
         <circle cx="74" cy="74" r={r} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="10" />
         <circle
           cx="74"
