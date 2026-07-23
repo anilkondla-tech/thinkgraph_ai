@@ -18,6 +18,7 @@ export function Logo({ className }: { className?: string }) {
       src="/logo.png"
       alt="ThinkGraph AI"
       className={`${className ?? ""} animate-spin-slow`}
+      style={{ transform: "scale(1.2)" }}
     />
   );
 }
