@@ -13,13 +13,16 @@ const base = {
 
 export function Logo({ className }: { className?: string }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src="/logo.png"
-      alt="ThinkGraph AI"
-      className={className}
-      style={{ filter: "drop-shadow(0 0 6px rgba(94, 106, 210, 0.4))" }}
-    />
+    <span
+      className="inline-flex items-center justify-center rounded-xl bg-white/[0.08] backdrop-blur-sm border border-white/[0.06] p-1.5"
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logo.png"
+        alt="ThinkGraph AI"
+        className={className}
+      />
+    </span>
   );
 }
 
