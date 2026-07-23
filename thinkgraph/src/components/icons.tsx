@@ -13,28 +13,8 @@ const base = {
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 32 32" fill="none">
-      <defs>
-        <linearGradient id="tg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#8B94E8" />
-          <stop offset="1" stopColor="#5b4bd6" />
-        </linearGradient>
-      </defs>
-      <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#tg)" opacity="0.18" />
-      <rect x="1" y="1" width="30" height="30" rx="9" stroke="url(#tg)" strokeWidth="1.2" />
-      <g stroke="url(#tg)" strokeWidth="1.6">
-        <line x1="10" y1="11" x2="20" y2="9" />
-        <line x1="10" y1="11" x2="13" y2="21" />
-        <line x1="20" y1="9" x2="22" y2="19" />
-        <line x1="13" y1="21" x2="22" y2="19" />
-      </g>
-      <g fill="#cfc7ff">
-        <circle cx="10" cy="11" r="2.6" />
-        <circle cx="20" cy="9" r="2.2" />
-        <circle cx="13" cy="21" r="2.2" />
-        <circle cx="22" cy="19" r="2.4" />
-      </g>
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/logo.png" alt="ThinkGraph AI" className={className} />
   );
 }
 
