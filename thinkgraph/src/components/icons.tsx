@@ -14,7 +14,8 @@ const base = {
 export function Logo({ className }: { className?: string }) {
   return (
     <span
-      className="inline-flex items-center justify-center rounded-xl bg-white/[0.08] backdrop-blur-sm border border-white/[0.06] p-1.5"
+      className="inline-flex items-center justify-center rounded-xl bg-white/[0.08] backdrop-blur-sm border border-white/[0.06] p-2"
+      style={{ boxShadow: "0 0 16px 4px rgba(62, 219, 194, 0.15), 0 0 6px 2px rgba(94, 106, 210, 0.12)" }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

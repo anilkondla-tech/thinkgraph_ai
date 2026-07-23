@@ -59,7 +59,7 @@ export default function Shell({
       {/* Sidebar */}
       <aside className="sticky top-0 hidden h-screen w-[260px] shrink-0 flex-col border-r border-surface-border bg-ink-900/80 px-4 py-6 backdrop-blur-xl md:flex">
         <Link href={withSite("/")} className="mb-9 flex items-center gap-2.5 px-2">
-          <Logo className="h-8 w-8" />
+          <Logo className="h-10 w-10" />
           <div className="leading-tight">
             <div className="text-[15px] font-semibold text-white">ThinkGraph</div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent-soft font-mono">
@@ -130,7 +130,7 @@ export default function Shell({
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-surface-border bg-ink-950/80 px-5 py-3 backdrop-blur-xl md:px-8">
           <div className="flex items-center gap-2 md:hidden">
-            <Logo className="h-7 w-7" />
+            <Logo className="h-9 w-9" />
             <span className="font-semibold text-white">ThinkGraph</span>
           </div>
 
