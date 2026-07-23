@@ -14,7 +14,12 @@ const base = {
 export function Logo({ className }: { className?: string }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src="/logo.png" alt="ThinkGraph AI" className={className} />
+    <img
+      src="/logo.png"
+      alt="ThinkGraph AI"
+      className={className}
+      style={{ filter: "drop-shadow(0 0 6px rgba(94, 106, 210, 0.4))" }}
+    />
   );
 }
 
