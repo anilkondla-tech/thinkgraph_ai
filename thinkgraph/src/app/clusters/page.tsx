@@ -53,6 +53,7 @@ export default async function ClustersPage({
                 {metric("Internal links", c.internalLinks)}
                 {metric("Link density", c.linkDensity, c.linkDensity < 0.5)}
                 {metric("Orphans", c.orphanCount, c.orphanCount > 0)}
+                {metric("Dead ends", c.deadEndCount, c.deadEndCount > 0)}
                 {metric("Missing keywords", c.missingKeywordCount, c.missingKeywordCount > 0)}
               </div>
 

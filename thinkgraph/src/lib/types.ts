@@ -17,9 +17,18 @@ export type GraphNode = {
   author: string;
   status: PostStatus;
   date: string; // ISO
+  modified: string; // ISO — last modified date
   inDegree: number;
   outDegree: number;
   orphan: boolean; // no inbound internal links
+  deadEnd: boolean; // no outbound internal links
+  wordCount: number;
+  headingCount: number;
+  imageCount: number;
+  externalLinks: number;
+  tags: string[];
+  hasFeaturedImage: boolean;
+  hasMetaDescription: boolean;
 };
 
 export type GraphEdge = {
@@ -34,6 +43,7 @@ export type Cluster = {
   linkDensity: number; // edges / posts
   orphanCount: number;
   missingKeywordCount: number;
+  deadEndCount: number;
   health: "thin" | "healthy" | "crowded";
 };
 
@@ -53,6 +63,46 @@ export type ActionItem = {
   cluster?: string;
   targets?: { label: string; url?: string }[];
   source: "rule" | "ai";
+};
+
+export type ContentQuality = {
+  avgWordCount: number;
+  medianWordCount: number;
+  thinContent: number; // posts < 300 words
+  missingFeaturedImages: number;
+  missingMetaDescriptions: number;
+  avgHeadings: number;
+  avgImages: number;
+};
+
+export type FreshnessMetrics = {
+  staleCount: number; // not modified in 12 months
+  evergreenRatio: number; // modified within 6 months / total
+};
+
+export type EngagementMetrics = {
+  avgCommentsPerPost: number;
+  topCommentedPosts: { label: string; slug: string; count: number }[];
+  commentBreakdown: { approved: number; pending: number; spam: number };
+};
+
+export type LinkInsights = {
+  deadEnds: number;
+  crossClusterLinks: number;
+  biDirectionalLinks: number;
+  linkReciprocityRate: number;
+};
+
+export type AuthorStat = {
+  name: string;
+  postCount: number;
+  categories: string[];
+};
+
+export type TagCoverage = {
+  totalTags: number;
+  postsWithoutTags: number;
+  overTaggedPosts: number; // posts with > 10 tags
 };
 
 export type SiteAnalytics = {
@@ -78,4 +128,10 @@ export type SiteAnalytics = {
   actions: ActionItem[];
   aiInsight: string | null;
   aiEnabled: boolean;
+  contentQuality: ContentQuality;
+  freshness: FreshnessMetrics;
+  engagement: EngagementMetrics;
+  linkInsights: LinkInsights;
+  authorStats: AuthorStat[];
+  tagCoverage: TagCoverage;
 };

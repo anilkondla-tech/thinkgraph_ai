@@ -38,6 +38,18 @@ SITE: ${a.site.label} (${a.site.url})
 Health score: ${a.healthScore}/100
 Published posts: ${a.totals.publishedPosts} | Internal links: ${a.totals.internalLinks} | Orphans: ${a.totals.orphans} | Missing keywords: ${a.totals.missingKeywords} | Categories: ${a.totals.categories}
 
+CONTENT QUALITY:
+Avg word count: ${a.contentQuality.avgWordCount} | Thin content (<300 words): ${a.contentQuality.thinContent} | Missing featured images: ${a.contentQuality.missingFeaturedImages} | Missing meta descriptions: ${a.contentQuality.missingMetaDescriptions}
+
+FRESHNESS:
+Stale (>12mo): ${a.freshness.staleCount} | Evergreen ratio: ${Math.round(a.freshness.evergreenRatio * 100)}%
+
+LINK INSIGHTS:
+Dead-end posts: ${a.linkInsights.deadEnds} | Cross-cluster links: ${a.linkInsights.crossClusterLinks} | Bi-directional: ${a.linkInsights.biDirectionalLinks} | Reciprocity: ${Math.round(a.linkInsights.linkReciprocityRate * 100)}%
+
+ENGAGEMENT:
+Avg comments/post: ${a.engagement.avgCommentsPerPost} | Approved: ${a.engagement.commentBreakdown.approved} | Pending: ${a.engagement.commentBreakdown.pending} | Spam: ${a.engagement.commentBreakdown.spam}
+
 CLUSTERS:
 ${clusterLines}
 
@@ -51,7 +63,7 @@ Return STRICT JSON (no markdown fences) with this shape:
     { "type": "write|link|keyword|cannibalization|refresh", "title": "short imperative", "rationale": "1-2 sentences", "impact": "high|medium|low", "cluster": "category name or empty" }
   ]
 }
-Provide 3-4 NEW actions that the rule-based list above does NOT already cover (focus on content gaps and topical-authority bridges). Keep titles under 70 chars.`;
+Provide 3-4 NEW actions that the rule-based list above does NOT already cover (focus on content gaps, topical-authority bridges, content freshness, and engagement opportunities). Keep titles under 70 chars.`;
 
   try {
     const msg = await client.messages.create({

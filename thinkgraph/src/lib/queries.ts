@@ -9,6 +9,7 @@ export type RawPost = {
   title: string;
   slug: string;
   date: string;
+  modified: string;
   status: string;
   author_id: number;
   content: string;
@@ -18,10 +19,16 @@ export type RawSite = {
   posts: RawPost[];
   authors: Map<number, string>;
   categoriesByPost: Map<number, string[]>;
+  tagsByPost: Map<number, string[]>;
   keywordByPost: Map<number, string>;
+  hasFeaturedImage: Set<number>;
+  hasMetaDescription: Set<number>;
   statusCounts: { status: string; count: number }[];
   totalPosts: number;
   totalComments: number;
+  commentsByPost: Map<number, number>;
+  commentBreakdown: { approved: number; pending: number; spam: number };
+  topCommentedPosts: { post_id: number; count: number }[];
 };
 
 export async function fetchRawSite(
@@ -43,11 +50,12 @@ export async function fetchRawSite(
     post_title: string;
     post_name: string;
     post_date: Date | string;
+    post_modified: Date | string;
     post_status: string;
     post_author: number;
     post_content: string;
   }>(
-    `SELECT ID, post_title, post_name, post_date, post_status, post_author, post_content
+    `SELECT ID, post_title, post_name, post_date, post_modified, post_status, post_author, post_content
      FROM ${p}posts
      WHERE post_type = 'post' AND post_status = 'publish'
      ORDER BY post_date DESC
@@ -59,6 +67,7 @@ export async function fetchRawSite(
     title: r.post_title || "(untitled)",
     slug: r.post_name || "",
     date: new Date(r.post_date as string).toISOString(),
+    modified: new Date(r.post_modified as string).toISOString(),
     status: r.post_status,
     author_id: Number(r.post_author),
     content: r.post_content || "",
@@ -86,7 +95,7 @@ export async function fetchRawSite(
 
   const kwRows = await q<{ post_id: number; meta_value: string }>(
     `SELECT post_id, meta_value FROM ${p}postmeta
-     WHERE meta_key IN ('rank_math_focus_keyword','_yoast_wpseo_focuskw','_aioseo_keywords','_keyword')
+     WHERE meta_key IN ('rank_math_focus_keyword','_yoast_wpseo_focuskw','_aioseo_keywords','_aioseo_keyphrases','_seopress_analysis_target_kw','_keyword')
        AND meta_value IS NOT NULL AND meta_value <> ''`
   );
   const keywordByPost = new Map<number, string>();
@@ -108,17 +117,78 @@ export async function fetchRawSite(
   const totalPosts = statusCounts.reduce((a, s) => a + s.count, 0);
 
   const commentRow = await q<{ count: number }>(
-    `SELECT COUNT(*) AS count FROM ${p}comments`
+    `SELECT COUNT(*) AS count FROM ${p}comments WHERE comment_approved = '1'`
   );
   const totalComments = Number(commentRow[0]?.count ?? 0);
+
+  // Tags per post
+  const tagRows = await q<{ post_id: number; tag: string }>(
+    `SELECT tr.object_id AS post_id, t.name AS tag
+     FROM ${p}term_relationships tr
+     JOIN ${p}term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+     JOIN ${p}terms t ON tt.term_id = t.term_id
+     WHERE tt.taxonomy = 'post_tag'`
+  );
+  const tagsByPost = new Map<number, string[]>();
+  tagRows.forEach((r) => {
+    const list = tagsByPost.get(Number(r.post_id)) ?? [];
+    list.push(r.tag);
+    tagsByPost.set(Number(r.post_id), list);
+  });
+
+  // Featured image coverage
+  const fiRows = await q<{ post_id: number }>(
+    `SELECT DISTINCT post_id FROM ${p}postmeta WHERE meta_key = '_thumbnail_id'`
+  );
+  const hasFeaturedImage = new Set<number>(fiRows.map((r) => Number(r.post_id)));
+
+  // Meta description coverage
+  const mdRows = await q<{ post_id: number }>(
+    `SELECT DISTINCT post_id FROM ${p}postmeta
+     WHERE meta_key IN ('_yoast_wpseo_metadesc','rank_math_description','_aioseo_description','_seopress_titles_desc')
+       AND meta_value IS NOT NULL AND meta_value <> ''`
+  );
+  const hasMetaDescription = new Set<number>(mdRows.map((r) => Number(r.post_id)));
+
+  // Comment breakdown by approval status
+  const cbRows = await q<{ status: string; count: number }>(
+    `SELECT comment_approved AS status, COUNT(*) AS count FROM ${p}comments GROUP BY comment_approved`
+  );
+  const commentBreakdown = { approved: 0, pending: 0, spam: 0 };
+  cbRows.forEach((r) => {
+    if (r.status === "1") commentBreakdown.approved = Number(r.count);
+    else if (r.status === "0") commentBreakdown.pending = Number(r.count);
+    else if (r.status === "spam") commentBreakdown.spam = Number(r.count);
+  });
+
+  // Approved comments per post
+  const cpRows = await q<{ post_id: number; count: number }>(
+    `SELECT comment_post_ID AS post_id, COUNT(*) AS count
+     FROM ${p}comments WHERE comment_approved = '1'
+     GROUP BY comment_post_ID`
+  );
+  const commentsByPost = new Map<number, number>();
+  cpRows.forEach((r) => commentsByPost.set(Number(r.post_id), Number(r.count)));
+
+  // Top 10 most-commented posts
+  const topCommentedPosts = cpRows
+    .map((r) => ({ post_id: Number(r.post_id), count: Number(r.count) }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
 
   return {
     posts: rawPosts,
     authors,
     categoriesByPost,
+    tagsByPost,
     keywordByPost,
+    hasFeaturedImage,
+    hasMetaDescription,
     statusCounts,
     totalPosts,
     totalComments,
+    commentsByPost,
+    commentBreakdown,
+    topCommentedPosts,
   };
 }

@@ -1,18 +1,63 @@
 import type {
   ActionItem,
+  AuthorStat,
   Cluster,
+  ContentQuality,
+  EngagementMetrics,
+  FreshnessMetrics,
   GraphEdge,
   GraphNode,
+  LinkInsights,
   SiteAnalytics,
   SiteMeta,
+  TagCoverage,
 } from "./types";
 import type { RawSite } from "./queries";
 
 const HREF_RE = /href=["']([^"']+)["']/gi;
 const PERMALINK_ID_RE = /[?&]p=(\d+)/;
+const HEADING_RE = /<h[2-6][^>]*>/gi;
+const IMG_RE = /<img[^>]*>/gi;
+const TAG_RE = /<[^>]+>/g;
 
 function lastSegment(pathname: string): string {
   return pathname.split("/").filter(Boolean).pop() ?? "";
+}
+
+function countWords(html: string): number {
+  const text = html.replace(TAG_RE, " ").replace(/&[^;]+;/g, " ");
+  return text.split(/\s+/).filter((w) => w.length > 0).length;
+}
+
+function countHeadings(html: string): number {
+  return (html.match(HEADING_RE) || []).length;
+}
+
+function countImages(html: string): number {
+  return (html.match(IMG_RE) || []).length;
+}
+
+function countExternalLinks(html: string, host: string): number {
+  const re = /href=["']([^"']+)["']/gi;
+  let count = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html)) !== null) {
+    const url = m[1].trim();
+    if (url.includes("://")) {
+      try {
+        const u = new URL(url);
+        if (host && u.host.replace(/^www\./, "") !== host) count++;
+      } catch { /* skip malformed URLs */ }
+    }
+  }
+  return count;
+}
+
+function median(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
 }
 
 /** Extract on-site internal links between known posts from post_content. */
@@ -96,9 +141,13 @@ export function analyzeSite(
   source: "live" | "demo",
   aiEnabled: boolean
 ): SiteAnalytics {
-  const { posts, authors, categoriesByPost, keywordByPost } = raw;
+  const { posts, authors, categoriesByPost, tagsByPost, keywordByPost,
+          hasFeaturedImage, hasMetaDescription, commentsByPost } = raw;
 
   const edges = buildEdges(posts, site.url);
+
+  let siteHost = "";
+  try { siteHost = new URL(site.url).host.replace(/^www\./, ""); } catch { /* */ }
 
   const inDeg = new Map<string, number>();
   const outDeg = new Map<string, number>();
@@ -109,8 +158,10 @@ export function analyzeSite(
 
   const nodes: GraphNode[] = posts.map((p) => {
     const cats = categoriesByPost.get(p.id) ?? [];
+    const tags = tagsByPost.get(p.id) ?? [];
     const id = String(p.id);
     const inb = inDeg.get(id) ?? 0;
+    const out = outDeg.get(id) ?? 0;
     return {
       id,
       label: p.title,
@@ -120,9 +171,18 @@ export function analyzeSite(
       author: authors.get(p.author_id) ?? "Unknown",
       status: p.status,
       date: p.date,
+      modified: p.modified,
       inDegree: inb,
-      outDegree: outDeg.get(id) ?? 0,
+      outDegree: out,
       orphan: inb === 0,
+      deadEnd: out === 0,
+      wordCount: countWords(p.content),
+      headingCount: countHeadings(p.content),
+      imageCount: countImages(p.content),
+      externalLinks: countExternalLinks(p.content, siteHost),
+      tags,
+      hasFeaturedImage: hasFeaturedImage.has(p.id),
+      hasMetaDescription: hasMetaDescription.has(p.id),
     };
   });
 
@@ -142,6 +202,7 @@ export function analyzeSite(
       ).length;
       const orphanCount = group.filter((n) => n.orphan).length;
       const missingKeywordCount = group.filter((n) => !n.keyword).length;
+      const deadEndCount = group.filter((n) => n.deadEnd).length;
       const postCount = group.length;
       const linkDensity = postCount ? +(internalLinks / postCount).toFixed(2) : 0;
       const health: Cluster["health"] =
@@ -153,6 +214,7 @@ export function analyzeSite(
         linkDensity,
         orphanCount,
         missingKeywordCount,
+        deadEndCount,
         health,
       };
     })
@@ -186,7 +248,84 @@ export function analyzeSite(
     .slice(0, 10)
     .map((c) => ({ category: c.category, count: c.postCount }));
 
-  const actions = buildRuleActions(nodes, clusters, site);
+  const actions = buildRuleActions(nodes, clusters, edges, site);
+
+  // ---------- Content Quality ----------
+  const wordCounts = nodes.map((n) => n.wordCount);
+  const contentQuality: ContentQuality = {
+    avgWordCount: publishedPosts ? Math.round(wordCounts.reduce((a, b) => a + b, 0) / publishedPosts) : 0,
+    medianWordCount: median(wordCounts),
+    thinContent: nodes.filter((n) => n.wordCount < 300).length,
+    missingFeaturedImages: nodes.filter((n) => !n.hasFeaturedImage).length,
+    missingMetaDescriptions: nodes.filter((n) => !n.hasMetaDescription).length,
+    avgHeadings: publishedPosts ? +(nodes.reduce((a, n) => a + n.headingCount, 0) / publishedPosts).toFixed(1) : 0,
+    avgImages: publishedPosts ? +(nodes.reduce((a, n) => a + n.imageCount, 0) / publishedPosts).toFixed(1) : 0,
+  };
+
+  // ---------- Freshness ----------
+  const nowMs = Date.now();
+  const TWELVE_MONTHS = 365 * 24 * 60 * 60 * 1000;
+  const SIX_MONTHS = 182 * 24 * 60 * 60 * 1000;
+  const staleCount = nodes.filter((n) => nowMs - new Date(n.modified).getTime() > TWELVE_MONTHS).length;
+  const evergreenCount = nodes.filter((n) => nowMs - new Date(n.modified).getTime() < SIX_MONTHS).length;
+  const freshness: FreshnessMetrics = {
+    staleCount,
+    evergreenRatio: publishedPosts ? +(evergreenCount / publishedPosts).toFixed(2) : 0,
+  };
+
+  // ---------- Engagement ----------
+  const topCommentedPosts = raw.topCommentedPosts
+    .map((tc) => {
+      const node = nodes.find((n) => n.id === String(tc.post_id));
+      return node
+        ? { label: node.label, slug: node.slug, count: tc.count }
+        : null;
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null);
+
+  const engagement: EngagementMetrics = {
+    avgCommentsPerPost: publishedPosts ? +(raw.totalComments / publishedPosts).toFixed(1) : 0,
+    topCommentedPosts,
+    commentBreakdown: raw.commentBreakdown,
+  };
+
+  // ---------- Link Insights ----------
+  const edgeSet = new Set(edges.map((e) => `${e.source}->${e.target}`));
+  const biDirectionalLinks = edges.filter((e) => edgeSet.has(`${e.target}->${e.source}`)).length / 2;
+  const crossClusterLinks = edges.filter((e) => {
+    const sNode = nodes.find((n) => n.id === e.source);
+    const tNode = nodes.find((n) => n.id === e.target);
+    return sNode && tNode && sNode.category !== tNode.category;
+  }).length;
+  const deadEnds = nodes.filter((n) => n.deadEnd).length;
+
+  const linkInsights: LinkInsights = {
+    deadEnds,
+    crossClusterLinks,
+    biDirectionalLinks: Math.round(biDirectionalLinks),
+    linkReciprocityRate: edges.length ? +((biDirectionalLinks * 2) / edges.length).toFixed(2) : 0,
+  };
+
+  // ---------- Author Stats ----------
+  const authorMap = new Map<string, { postCount: number; cats: Set<string> }>();
+  nodes.forEach((n) => {
+    const entry = authorMap.get(n.author) ?? { postCount: 0, cats: new Set<string>() };
+    entry.postCount++;
+    entry.cats.add(n.category);
+    authorMap.set(n.author, entry);
+  });
+  const authorStats: AuthorStat[] = Array.from(authorMap.entries())
+    .map(([name, d]) => ({ name, postCount: d.postCount, categories: [...d.cats] }))
+    .sort((a, b) => b.postCount - a.postCount);
+
+  // ---------- Tag Coverage ----------
+  const allTags = new Set<string>();
+  nodes.forEach((n) => n.tags.forEach((t) => allTags.add(t)));
+  const tagCoverage: TagCoverage = {
+    totalTags: allTags.size,
+    postsWithoutTags: nodes.filter((n) => n.tags.length === 0).length,
+    overTaggedPosts: nodes.filter((n) => n.tags.length > 10).length,
+  };
 
   return {
     site,
@@ -211,6 +350,12 @@ export function analyzeSite(
     actions,
     aiInsight: null,
     aiEnabled,
+    contentQuality,
+    freshness,
+    engagement,
+    linkInsights,
+    authorStats,
+    tagCoverage,
   };
 }
 
@@ -275,6 +420,7 @@ function suggestLinkSources(
 function buildRuleActions(
   nodes: GraphNode[],
   clusters: Cluster[],
+  edges: GraphEdge[],
   site: SiteMeta
 ): ActionItem[] {
   const actions: ActionItem[] = [];
@@ -371,7 +517,49 @@ function buildRuleActions(
         source: "rule",
       });
     });
+  // 5. Dead-end posts — no outbound internal links (reader has no exit path)
+  nodes
+    .filter((n) => n.deadEnd && !n.orphan) // prioritize non-orphans (orphans already have a link action)
+    .sort(byDateDesc)
+    .slice(0, 4)
+    .forEach((n) => {
+      const sameCat = nodes.filter((o) => o.id !== n.id && o.category === n.category);
+      const targets = sameCat.slice(0, 3).map((t) => ({
+        label: t.label,
+        url: articleUrl(site, t.slug, t.id),
+      }));
+      actions.push({
+        id: `deadend-${n.id}`,
+        type: "link",
+        title: `Add outbound links from "${n.label}"`,
+        rationale: `This post has zero outbound internal links — readers hit a dead end. Add contextual links to keep them navigating and distribute link equity.`,
+        impact: "medium",
+        cluster: n.category,
+        targets: targets.length ? targets : [{ label: n.label, url: articleUrl(site, n.slug, n.id) }],
+        source: "rule",
+      });
+    });
 
+  // 6. Stale content — not modified in over 12 months
+  const TWELVE_MONTHS_MS = 365 * 24 * 60 * 60 * 1000;
+  const nowMs = Date.now();
+  nodes
+    .filter((n) => nowMs - new Date(n.modified).getTime() > TWELVE_MONTHS_MS)
+    .sort((a, b) => new Date(a.modified).getTime() - new Date(b.modified).getTime())
+    .slice(0, 4)
+    .forEach((n) => {
+      const monthsAgo = Math.round((nowMs - new Date(n.modified).getTime()) / (30 * 24 * 60 * 60 * 1000));
+      actions.push({
+        id: `refresh-${n.id}`,
+        type: "refresh",
+        title: `Refresh "${n.label}"`,
+        rationale: `Last updated ${monthsAgo} months ago. Stale content loses rankings over time. Update stats, links, and screenshots to signal freshness to Google.`,
+        impact: "medium",
+        cluster: n.category,
+        targets: [{ label: n.label, url: articleUrl(site, n.slug, n.id) }],
+        source: "rule",
+      });
+    });
   const rank = { high: 0, medium: 1, low: 2 };
   return actions.sort((a, b) => rank[a.impact] - rank[b.impact]);
 }
