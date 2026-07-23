@@ -2,6 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import {
   Logo,
   IconGraph,
@@ -13,7 +14,10 @@ import {
 
 // ─── Animated knowledge-graph SVG ──────────────────────────────────────────
 
-const NODES = [
+type GNode = { id: string; cx: number; cy: number; r: number; color: string; glow: boolean };
+type GEdge = [string, string];
+
+const BASE_NODES: GNode[] = [
   { id: "a", cx: 48,  cy: 80,  r: 10, color: "#5E6AD2", glow: true  },
   { id: "b", cx: 200, cy: 42,  r: 7,  color: "#8B94E8", glow: false },
   { id: "c", cx: 130, cy: 152, r: 13, color: "#3EDBC2", glow: true  },
@@ -24,11 +28,9 @@ const NODES = [
   { id: "h", cx: 120, cy: 52,  r: 5,  color: "#8B94E8", glow: false },
   { id: "i", cx: 248, cy: 90,  r: 5,  color: "#5E6AD2", glow: false },
   { id: "j", cx: 58,  cy: 168, r: 4,  color: "#3EDBC2", glow: false },
-] as const;
+];
 
-const NM = Object.fromEntries(NODES.map((n) => [n.id, n]));
-
-const EDGES: [string, string][] = [
+const BASE_EDGES: GEdge[] = [
   ["a","h"],["a","c"],["a","j"],
   ["h","b"],["h","c"],
   ["b","i"],["b","e"],
@@ -37,7 +39,65 @@ const EDGES: [string, string][] = [
   ["f","g"],["d","j"],
 ];
 
+const EXTRA_NODES: GNode[] = [
+  { id: "k", cx: 160, cy: 10,  r: 5,  color: "#3EDBC2", glow: false },
+  { id: "l", cx: 260, cy: 150, r: 6,  color: "#F5A623", glow: false },
+  { id: "m", cx: 40,  cy: 260, r: 7,  color: "#5E6AD2", glow: true  },
+  { id: "n", cx: 240, cy: 260, r: 4,  color: "#8B94E8", glow: false },
+  { id: "o", cx: 10,  cy: 140, r: 5,  color: "#3EDBC2", glow: false },
+  { id: "p", cx: 170, cy: 100, r: 6,  color: "#5E6AD2", glow: false },
+  { id: "q", cx: 100, cy: 200, r: 4,  color: "#F5A623", glow: false },
+  { id: "r", cx: 260, cy: 210, r: 5,  color: "#8B94E8", glow: false },
+];
+
+const EXTRA_EDGES: { edge: GEdge; after: string }[] = [
+  { edge: ["k", "b"], after: "k" },
+  { edge: ["k", "h"], after: "k" },
+  { edge: ["l", "e"], after: "l" },
+  { edge: ["l", "i"], after: "l" },
+  { edge: ["m", "f"], after: "m" },
+  { edge: ["m", "d"], after: "m" },
+  { edge: ["n", "g"], after: "n" },
+  { edge: ["n", "e"], after: "n" },
+  { edge: ["o", "a"], after: "o" },
+  { edge: ["o", "j"], after: "o" },
+  { edge: ["p", "b"], after: "p" },
+  { edge: ["p", "c"], after: "p" },
+  { edge: ["q", "c"], after: "q" },
+  { edge: ["q", "f"], after: "q" },
+  { edge: ["r", "e"], after: "r" },
+  { edge: ["r", "l"], after: "r" },
+];
+
+const NM = Object.fromEntries([...BASE_NODES, ...EXTRA_NODES].map((n) => [n.id, n]));
+
 function LiveGraph() {
+  const [visibleNodes, setVisibleNodes] = useState<Set<string>>(
+    new Set(BASE_NODES.map((n) => n.id))
+  );
+  const [visibleEdges, setVisibleEdges] = useState<GEdge[]>(BASE_EDGES);
+
+  useEffect(() => {
+    let idx = 0;
+    const interval = setInterval(() => {
+      if (idx >= EXTRA_NODES.length) {
+        // Reset and start over
+        idx = 0;
+        setVisibleNodes(new Set(BASE_NODES.map((n) => n.id)));
+        setVisibleEdges(BASE_EDGES);
+        return;
+      }
+      const newNode = EXTRA_NODES[idx];
+      setVisibleNodes((prev) => new Set([...prev, newNode.id]));
+      const newEdges = EXTRA_EDGES.filter((e) => e.after === newNode.id).map((e) => e.edge);
+      setVisibleEdges((prev) => [...prev, ...newEdges]);
+      idx++;
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const allNodes = [...BASE_NODES, ...EXTRA_NODES];
+
   return (
     <div className="h-full w-full animate-rotate3d" style={{ perspective: "800px" }}>
       <svg viewBox="0 0 270 280" className="h-full w-full" aria-hidden style={{ transformStyle: "preserve-3d" }}>
@@ -51,24 +111,34 @@ function LiveGraph() {
         </filter>
       </defs>
       {/* Edges */}
-      {EDGES.map(([a, b]) => (
-        <line
-          key={`${a}-${b}`}
-          x1={NM[a as keyof typeof NM].cx}
-          y1={NM[a as keyof typeof NM].cy}
-          x2={NM[b as keyof typeof NM].cx}
-          y2={NM[b as keyof typeof NM].cy}
-          stroke="rgba(94,106,210,0.22)"
-          strokeWidth="1.2"
-        />
-      ))}
+      {visibleEdges.map(([a, b]) => {
+        const na = NM[a];
+        const nb = NM[b];
+        if (!na || !nb) return null;
+        return (
+          <line
+            key={`${a}-${b}`}
+            x1={na.cx}
+            y1={na.cy}
+            x2={nb.cx}
+            y2={nb.cy}
+            stroke="rgba(94,106,210,0.22)"
+            strokeWidth="1.2"
+            className="animate-fade-in"
+          />
+        );
+      })}
       {/* Nodes */}
-      {NODES.map((n) => (
-        <g key={n.id} filter={n.glow ? "url(#lg-glow)" : undefined}>
-          <circle cx={n.cx} cy={n.cy} r={n.r * 2.4} fill={n.color} opacity={0.07} />
-          <circle cx={n.cx} cy={n.cy} r={n.r}       fill={n.color} opacity={0.88} />
-        </g>
-      ))}
+      {allNodes.map((n) => {
+        if (!visibleNodes.has(n.id)) return null;
+        const isNew = !BASE_NODES.find((bn) => bn.id === n.id);
+        return (
+          <g key={n.id} filter={n.glow ? "url(#lg-glow)" : undefined} className={isNew ? "animate-fade-up" : ""}>
+            <circle cx={n.cx} cy={n.cy} r={n.r * 2.4} fill={n.color} opacity={0.07} />
+            <circle cx={n.cx} cy={n.cy} r={n.r} fill={n.color} opacity={0.88} />
+          </g>
+        );
+      })}
     </svg>
     </div>
   );
