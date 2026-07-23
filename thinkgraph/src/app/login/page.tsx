@@ -39,7 +39,8 @@ const EDGES: [string, string][] = [
 
 function LiveGraph() {
   return (
-    <svg viewBox="0 0 270 280" className="h-full w-full" aria-hidden>
+    <div className="h-full w-full animate-rotate3d" style={{ perspective: "800px" }}>
+      <svg viewBox="0 0 270 280" className="h-full w-full" aria-hidden style={{ transformStyle: "preserve-3d" }}>
       <defs>
         <filter id="lg-glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="5" result="blur" />
@@ -69,6 +70,7 @@ function LiveGraph() {
         </g>
       ))}
     </svg>
+    </div>
   );
 }
 

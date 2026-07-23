@@ -76,6 +76,13 @@ const config: Config = {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
         },
+        rotate3d: {
+          "0%": { transform: "rotateX(0deg) rotateY(0deg) rotateZ(0deg)" },
+          "25%": { transform: "rotateX(8deg) rotateY(-12deg) rotateZ(3deg)" },
+          "50%": { transform: "rotateX(-5deg) rotateY(10deg) rotateZ(-4deg)" },
+          "75%": { transform: "rotateX(10deg) rotateY(6deg) rotateZ(2deg)" },
+          "100%": { transform: "rotateX(0deg) rotateY(0deg) rotateZ(0deg)" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both",
@@ -84,6 +91,7 @@ const config: Config = {
         float: "float 5s ease-in-out infinite",
         shimmer: "shimmer 2s infinite",
         "spin-slow": "spin-slow 12s linear infinite",
+        rotate3d: "rotate3d 15s ease-in-out infinite",
       },
     },
   },
